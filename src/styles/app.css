@@ -1,0 +1,24 @@
+
+.p-panel .p-panel-header {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1.25rem;
+    color: #374151;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.p-panel .p-panel-content {
+    padding: 1.25rem;
+    background: #ffffff;
+    color: #4b5563;
+    border: none;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top: 0 none;
+}
+.c-empty {
+    color: #37415183;
+    font-size: medium;
+}

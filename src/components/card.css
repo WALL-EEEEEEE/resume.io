@@ -1,0 +1,71 @@
+ * {
+    margin: 0px;
+    padding: 0px;
+    border: 00px;
+    font-size: 100%;
+    font: inherit;
+ }
+
+.card {
+    /* define the variables */
+    --card-border-radius: 8px;
+    --card-border-color:  #dbdfe3f3;
+    --card-title-font-size: 1.8rem;
+    --card-subtitle-font-size: 1.2rem;
+    --card-content-font-size: 0.8rem;
+
+
+    display: grid;
+    grid-template:
+    "title top-right-action"
+    "subtitle subtitle"
+    "content content"
+    "bottom-left-action bottom-right-action"
+    /[col-start] 1fr [col-2] 1fr [col-end];
+    border-radius: var(--card-border-radius);
+    border: 1px solid var(--card-border-color);
+    padding: 20px;
+
+    .title {
+        grid-area: title;
+        font-size: var(--card-title-font-size);
+    }
+
+    .subtitle {
+        grid-area: subtitle;
+        font-size: var(--card-subtitle-font-size);
+    }
+    .content {
+        grid-area: content;
+        font-size: var(--card-content-font-size);
+        width: 90%;
+        margin: 0 auto;
+
+        .container {
+            margin: 20px 0;
+            text-wrap: wrap;
+        }
+    }
+    .actions {
+        grid-area: top-right-action;
+        margin-right: 10px;
+        align-items: center;
+        justify-self: end;
+        display: flex;
+        flex-direction: row;
+        :not(:last-child) {
+           margin-right: 10px;
+        }
+    }
+
+    .top-right-action {
+        grid-area: top-right-action;
+    }
+    .bottom-left-action {
+        grid-area: bottom-left-action;
+    }
+    .bottom-right-action {
+        grid-area: bottom-right-action;
+    }
+}
+
