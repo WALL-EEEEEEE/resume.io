@@ -14,7 +14,8 @@ const coverLetterSlice = createSlice({
     initialState,
     reducers: {
         editCoverLetter: (state, action: PayloadAction<[CoverLetter, number]>) => {
-            state.coverLetter = action.payload[0]
+            //to plain object
+            state.coverLetter = {...action.payload[0]}
         },
    }
 

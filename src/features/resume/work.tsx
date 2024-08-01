@@ -104,7 +104,7 @@ function AddWork({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addWorkAction(editWork))
+          dispatch(addWorkAction({...editWork}))
           setVisible(false);
         }}
       />
@@ -292,7 +292,7 @@ function EditWork({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(editWorkAction([editWork, work_id]))
+          dispatch(editWorkAction([{...editWork}, work_id]))
           setVisible(false);
         }}
       />
@@ -466,8 +466,11 @@ function EditWork({
 }
 
 const WorkList = () => {
-  const works =  useSelector((state: RootState) => state.resume.works )
+  const works =  useSelector((state: RootState) => state.resume.resume?.works )
   const [openAdd, setOpenAdd] = useState(false)
+  if (works === undefined || works == null) {
+    return
+  }
 
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {
     const className = `${options.className} justify-content-space-between`;

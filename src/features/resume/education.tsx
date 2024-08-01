@@ -94,7 +94,7 @@ function AddEducation({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addEducationAction(newEducation))
+          dispatch(addEducationAction({...newEducation}))
           setVisible(false);
         }}
       />
@@ -283,7 +283,7 @@ function EditEducation({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(editEducationAction([editEducation, education_id]))
+          dispatch(editEducationAction([{...editEducation}, education_id]))
           setVisible(false);
         }}
       />
@@ -450,8 +450,11 @@ function EditEducation({
 }
 
 const EducationList = () => {
-  const educations = useSelector((state: RootState) => state.resume.educations)
+  const educations = useSelector((state: RootState) => state.resume.resume?.educations)
   const [openAdd, setOpenAdd] = useState(false)
+  if (educations === undefined || educations === null) {
+    return
+  }
 
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {
     const className = `${options.className} justify-content-space-between`;

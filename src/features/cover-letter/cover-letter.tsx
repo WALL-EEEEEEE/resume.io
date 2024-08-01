@@ -118,7 +118,7 @@ function EditCoverLetter({ coverLetter, coverLetterId, visible, setVisible }: { 
   const footer = (
     <div className="actions">
       <Button label="Save" icon="pi pi-check-circle" onClick={() => {
-        dispatch(editCoverLetterAction([editCoverLetter, coverLetterId]))
+        dispatch(editCoverLetterAction([{...editCoverLetter}, coverLetterId]))
         setVisible(false)
       }} />
 

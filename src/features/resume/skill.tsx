@@ -13,8 +13,11 @@ import { delSkill as delSkillAction, addSkill as addSkillAction } from "./resume
 
 const SkillList = () => {
   const [openAdd, setOpenAdd] = useState(false)
-  const skills = useSelector((state: RootState) => state.resume.skills)
+  const skills = useSelector((state: RootState) => state.resume.resume?.skills)
   const dispatch = useDispatch<AppDispatch>()
+  if (skills == undefined || skills == null) {
+    return
+  }
 
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {
     const className = `${options.className} justify-content-space-between`;
@@ -35,13 +38,13 @@ const SkillList = () => {
   return (
     <Panel
       headerTemplate={headerTemplate}
-      {...(skills.length > 0 ? { toggleable: true } : {})}
-      {...(skills.length > 0 ? { collapsed: true } : {})}
+      {...(skills != undefined && skills != null && skills.length > 0 ? { toggleable: true } : {})}
+      {...(skills != undefined && skills != null && skills.length > 0 ? { collapsed: true } : {})}
       expandIcon={PrimeIcons.ANGLE_DOWN}
       collapseIcon={PrimeIcons.ANGLE_UP}
     >
       <AddSkill visible={openAdd} setVisible={setOpenAdd} />
-      {skills.length > 0 ? (
+      {skills != undefined && skills != null && skills.length > 0 ? (
         <ul className="list-none flex flex-column gap-3">
           {skills.map((skill, index) => {
             return (
@@ -78,7 +81,7 @@ function AddSkill({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addSkillAction(newSkill))
+          dispatch(addSkillAction({...newSkill}))
           setVisible(false);
         }}
       />

@@ -1,10 +1,11 @@
 export class Resume  {
-    summary: About = {} as About;
-    projects: Project[] = [];
-    works: Work[] = [];
-    skills: Skill[] = [];
-    educations: Education[] = [];
-    contacts: Contact[] = [];
+    profileImage?:string 
+    about?: About
+    projects?: Project[]
+    works?: Work[]
+    skills?: Skill[]
+    educations?: Education[]
+    contacts?: Contact[]
 }
 
 export class About  {

@@ -1,7 +1,7 @@
 import { PrimeIcons } from "primereact/api";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 // import "../../styles/project.css";
-import { Contract, LocationKind,  Project as ProjectProps} from "../../types/resume";
+import { Project as ProjectProps} from "../../types/resume";
 import { Card } from "primereact/card";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import "primeicons/primeicons.css";
@@ -16,9 +16,8 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Editor, EditorTextChangeEvent } from "primereact/editor";
 import { Calendar } from "primereact/calendar";
-import { EnumToObjects } from "../../utils/enum";
-// @ts-ignore
-import Microlink from '@microlink/react'
+//@ts-ignore
+import  Microlink from '@microlink/react'
 import { createMarkup } from "../../utils/html";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
@@ -104,7 +103,7 @@ function AddProject({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addProjectAction(newProject))
+          dispatch(addProjectAction({...newProject}))
           setVisible(false);
         }}
       />
@@ -244,7 +243,7 @@ function EditProject({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(editProjectAction([editProject, project_id]))
+          dispatch(editProjectAction([{...editProject}, project_id]))
           setVisible(false);
         }}
       />
@@ -363,8 +362,11 @@ function EditProject({
 }
 
 const ProjectList = () => {
-  const projects = useSelector((state: RootState) => state.resume.projects)
+  const projects = useSelector((state: RootState) => state.resume.resume?.projects)
   const [openAdd, setOpenAdd] = useState(false)
+  if (projects === undefined || projects === null) {
+    return
+  }
 
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {
     const className = `${options.className} justify-content-space-between`;

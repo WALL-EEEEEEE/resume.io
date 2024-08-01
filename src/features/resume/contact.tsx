@@ -33,7 +33,7 @@ function AddContact({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addContactAction(newContact))
+          dispatch(addContactAction({...newContact}))
           setVisible(false);
         }}
       />
@@ -164,12 +164,16 @@ function EditContact({
 }
 
 const ContactList = () => {
-  const contacts = useSelector((state: RootState) => state.resume.contacts)
+  const contacts = useSelector((state: RootState) => state.resume.resume?.contacts)
   const dispatch = useDispatch<AppDispatch>()
-
   const [addContactKind, setAddContactKind] = useState(ContactKind.NotSpecified)
   const [openAdd, setOpenAdd] = useState(false);
   const menu: MutableRefObject<TieredMenu | null> = useRef(null);
+
+  if (contacts === undefined || contacts === null) {
+    return
+  }
+
   const add_items = [
     {
       label: "phone",

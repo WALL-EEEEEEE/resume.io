@@ -17,13 +17,16 @@ import { editAbout as editAboutAction } from "./resume-slice"
 
 
 const EditAbout = ({ visible, setVisible}: { visible: boolean, setVisible: Dispatch<SetStateAction<boolean>>    }) => {
-  const about = useSelector((state: RootState) => state.resume.summary )
+  const about = useSelector((state: RootState) => state.resume.resume?.about )
   const dispatch = useDispatch<AppDispatch>();
+  if (about === undefined || about === null) {
+      return 
+  }
 
   const current_about: AboutProps = {...about}
 
   const saveAbout= () => {
-      dispatch(editAboutAction(current_about))
+      dispatch(editAboutAction({...current_about}))
       setVisible(false)
   }
 
@@ -44,9 +47,13 @@ const EditAbout = ({ visible, setVisible}: { visible: boolean, setVisible: Dispa
 };
 
 const About = () => {
-  const about = useSelector((state: RootState) => state.resume.summary )
-
+  const about = useSelector((state: RootState) => state.resume.resume?.about )
   const [openEdit, setOpenEdit] = useState(false)
+
+  if (about == undefined || about == null) {
+    return
+  }
+
   const editClick  = () => {
     setOpenEdit(true)
   }
@@ -73,7 +80,7 @@ const About = () => {
       {about.desc && about.desc.length > 0 ? (
         <div dangerouslySetInnerHTML={createMarkup(about.desc)}>
         </div>): (
-        <span className="c-empty">No any summary added yet.</span>
+        <span className="c-empty">No any summary about yourself added yet.</span>
       )
       }
 
