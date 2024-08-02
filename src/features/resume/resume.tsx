@@ -13,8 +13,7 @@ import { MenuItem } from "primereact/menuitem";
 import { toPDFDocument } from "../../utils/pdf";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { initProject as initProjectAction, initWork as initWorkAction, initEducation as initEducationAction, initAbout as initAboutAction, initContact as initContactAction, initSkill as initSkillAction } from "./resume-slice";
-import { Project } from "../../types/resume";
+import { initProject as initProjectAction, initWork as initWorkAction, initEducation as initEducationAction, initAbout as initAboutAction, initContact as initContactAction, initSkill as initSkillAction, initProfilePicture as initProfilePictureAction } from "./resume-slice";
 
 
 const Resume = () => {
@@ -28,13 +27,13 @@ const Resume = () => {
         dispatch(initProjectAction())
       }
     },
-{
+    {
       label: "Work",
       command: () => {
         dispatch(initWorkAction())
       }
     },
-{
+    {
       label: "Education",
       command: () => {
         dispatch(initEducationAction())
@@ -58,8 +57,13 @@ const Resume = () => {
         dispatch(initContactAction())
       }
     },
+    {
+      label: "Profile Picture",
+      command: () => {
+        dispatch(initProfilePictureAction())
+      }
+    },
   ]
-
 
   const option_menu: MutableRefObject<TieredMenu | null> = useRef(null);
   const option_items: MenuItem[] = [
@@ -71,7 +75,7 @@ const Resume = () => {
       }
     }
   ]
-  
+
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {
     const className = `${options.className} justify-content-space-between`;
 
@@ -102,12 +106,8 @@ const Resume = () => {
     <Panel headerTemplate={headerTemplate} expandIcon={PrimeIcons.ANGLE_DOWN} collapseIcon={PrimeIcons.ANGLE_UP} >
       <div id="c-resume-container" className="c-resume flex flex-column gap-5">
         <section className="c-resume-item flex flex-row gap-4">
-          <div className="c-profile-image border-circle flex flex-row align-items-center">
-            <Image />
-          </div>
-          <div className="w-full">
-            <Summary />
-          </div>
+          <Image />
+          <Summary />
         </section>
         <section className="c-resume-item">
           <WorkList />

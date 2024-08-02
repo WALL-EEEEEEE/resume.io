@@ -13,6 +13,9 @@ const resumeSlice = createSlice({
     name: "resume",
     initialState,
     reducers: {
+        initProfilePicture: (state) => {
+           return {...state, resume: {...state.resume, profileImage: ""}}
+        },
         initProject: (state) => {
             if (state.resume.projects == undefined || state.resume.projects == null) {
                 state.resume.projects = []
@@ -30,17 +33,17 @@ const resumeSlice = createSlice({
         },
         initAbout: (state) => {
             if (state.resume.about == undefined || state.resume.about == null) {
-                state.resume.about = {...new About()}
+                return {...state, resume: {...state.resume, about: {...new About()}}}
             }
         },
         initSkill: (state) => {
             if (state.resume.skills == undefined || state.resume.skills == null) {
-                state.resume.skills = []
+                return {...state, resume: {...state.resume, skills: []}}
             }
         },
         initContact: (state) => {
             if (state.resume.contacts == undefined || state.resume.contacts == null) {
-                state.resume.contacts = []
+                return {...state, resume: {...state.resume, contacts: []}}
             }
         },
         addProject: (state, action: PayloadAction<Project>) => {
@@ -128,22 +131,21 @@ const resumeSlice = createSlice({
             state.resume.contacts[action.payload[1]]= {...action.payload[0]}
         },
         editAbout: (state, action: PayloadAction<About>) => {
-           state.resume.about = {...action.payload}
+           return {...state, resume: {...state.resume, about: action.payload}}
         },
-        addProfileImage: (state, action: PayloadAction<string>) => {
-        //    state.resume.profileImage = action.payload
+        addProfilePicture: (state, action: PayloadAction<string>) => {
            return {...state, resume: {...state.resume, profileImage: action.payload}}
         },
-        editProfileImage: (state, action: PayloadAction<string>) => {
-           state.resume.profileImage = action.payload
+        editProfilePicture: (state, action: PayloadAction<string>) => {
+           return {...state, resume: {...state.resume, profileImage: action.payload}}
         },
-        delProfileImage: (state, action: PayloadAction<string>) => {
-           state.resume.profileImage = undefined
+        delProfilePicture: (state, action: PayloadAction<string>) => {
+           return {...state, resume: {...state.resume, profileImage: undefined}}
         },
     }
 
 })
 
-export const { initProject, initWork, initEducation, initContact, initAbout, initSkill, addProject, delProject, editProject, addWork, delWork, editWork, addEducation, delEducation, editEducation, delSkill, addSkill, addContact, delContact, editContact,  editAbout, addProfileImage, editProfileImage, delProfileImage} = resumeSlice.actions
+export const { initProfilePicture, initProject, initWork, initEducation, initContact, initAbout, initSkill, addProject, delProject, editProject, addWork, delWork, editWork, addEducation, delEducation, editEducation, delSkill, addSkill, addContact, delContact, editContact,  editAbout, addProfilePicture, editProfilePicture, delProfilePicture} = resumeSlice.actions
 
 export default resumeSlice.reducer;

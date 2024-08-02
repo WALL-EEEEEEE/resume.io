@@ -19,32 +19,25 @@
 
 
 
-.letter-container {
-
-    height: 100%;
+.c-letter-container {
+    height: 90%;
     width: 100%;
     min-width: 100%;
-    min-height: 100%;
+    min-height: 90%;
     display: grid;
     grid-template:
-        "name name" 20%
+        "name name" 15%
         "company letter" auto
-        /[col-start] 1fr [col-1] 2fr [col-end];
+        /[col-start] 1fr [col-1] 4fr [col-end];
 
-    .name {
+    .c-name {
         grid-area: name;
         grid-column: 1/3;
         align-self: center;
-
-        /* font-size: var(--title-font-size);
-            font-weight: bolder;
- */
         font: var(--name-font);
-        margin-bottom: 60px;
-        margin-top: 30px;
     }
 
-    .company {
+    .c-company {
         grid-area: company;
         border-right: 1px solid var(--border-color);
         align-self: self-start;
@@ -52,29 +45,28 @@
         display: flex;
         flex-direction: column;
         box-sizing: border-box;
-        margin-right: 20px;
+        gap: 1.8rem;
         height: 100%;
 
         .hiring-manager-name {
-            flex-basis: 13%;
             font: var(--hiring-manager-font);
         }
 
         .job-title {
-            flex-basis: 13%;
             font: var(--job-title-font);
         }
 
         .company-name {
-            flex-basis: 13%;
             font: var(--company-name-font);
         }
     }
 
-    .letter-container {
+    .c-letter-content-container {
         grid-area: letter;
         display: flex;
         flex-direction: column;
+        overflow:scroll;
+        padding-left: 1.5rem;
 
         .letter-content {
             text-align: left;

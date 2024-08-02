@@ -23,10 +23,14 @@ export class PDFSize {
 }
 
 
-export function toPDFDocument(element: string, path: string, size: PageSize = PDFSize.A4) {
+export async function toPDFDocument(element: string, path: string, size: PageSize = PDFSize.A4) {
     const pdf_element = document.getElementById(element);
+    if (pdf_element === undefined || pdf_element === null) {
+        return
+    }
     //@ts-ignore
-    toCanvas(pdf_element).then((canvas) => {
+    const canvas = await toCanvas(pdf_element)
+    const imageToPDF = (canvas: HTMLCanvasElement) => {
         const pdf_padding_top = 30
         const canvas_width = pixel_to_mm*canvas.width
         const canvas_height = pixel_to_mm*canvas.height
@@ -39,11 +43,9 @@ export function toPDFDocument(element: string, path: string, size: PageSize = PD
             format: [pdf_width, pdf_height],
             compress: true,
         });
-        // console.log(`canvas: (${canvas.width}px, ${canvas.height}px)`)
-        // console.log(`converted canvas: (${canvas_width}mm, ${canvas_height}mm) `)
-        // console.log(`pdf: (${pdf.internal.pageSize.width}mm, ${pdf.internal.pageSize.height}mm )`)
         const pdf_padding_left = (pdf_width - canvas_width)/2
         pdf.addImage(imgData, 'JPEG', pdf_padding_left, pdf_padding_top, canvas_width , canvas_height);
         pdf.save(path);
-      });
+      };
+    imageToPDF(canvas)
   }

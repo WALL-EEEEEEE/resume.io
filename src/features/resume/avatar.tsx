@@ -16,7 +16,7 @@ import '@uppy/webcam/dist/style.min.css';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { createFile, getFile } from "../../utils/opfs";
-import { addProfileImage, editProfileImage, delProfileImage } from "./resume-slice";
+import { addProfilePicture as addProfilePictureAction, editProfilePicture as editProfilePictureAction, delProfilePicture as delProfilePictureAction} from "./resume-slice";
 import Dashboard from "@uppy/dashboard/lib/Dashboard";
 
 const profileImagesDirector = "profile/images"
@@ -38,7 +38,7 @@ async function generateImageURL(path: string): Promise<string> {
   return imageURL
 }
 
-function AddImage({
+function AddProfilePicture({
   addImage,
   visible,
   setVisible,
@@ -98,7 +98,7 @@ function AddImage({
   );
 }
 
-function EditImage({
+function EditProfilePicture({
   image,
   setImage,
   visible,
@@ -158,7 +158,7 @@ function EditImage({
   );
 }
 
-const Image = () => {
+const ProfilePicture = () => {
   const image = useSelector((state: RootState) => state.resume.resume?.profileImage)
   const [imageURL, setImageURL] = useState("")
   const dispatch = useDispatch<AppDispatch>();
@@ -211,6 +211,10 @@ const Image = () => {
       }
     },
   }).use(ImageEditor).use(Dashboard));
+
+  if (image === null || image === undefined) {
+    return (<></>)
+  }
   const dashboardModal = uppy.getPlugin("Dashboard");
 
   uppy.addUploader(async (fileIds, uploadId) => {
@@ -225,18 +229,17 @@ const Image = () => {
     } catch (err) {
       console.trace(err)
     }
-    dispatch(addProfileImage(storePath))
+    dispatch(addProfilePictureAction(storePath))
     //@ts-ignore
      if (dashboardModal.isModalOpen()) {
         //@ts-ignore
         dashboardModal.closeModal()
       }
-
   })
   const style = imageURL && imageURL.length > 0? {width: "250px", height: "250px", backgroundImage: `url("${imageURL}")`, backgroundSize: "cover", backgroundPosition: "center"}: {width: "250px", height: "250px"}
 
   return (
-    <>
+    <div className="c-avatar-image border-circle flex flex-row align-items-center">
       {/* <EditImage
           image={image}
           setImage={setImage}
@@ -250,13 +253,12 @@ const Image = () => {
         proudlyDisplayPoweredByUppy={false}
       /> */}
       <div id="c-image-uploader" className="c-image-uploader"></div>
-      <div className="c-image-container p-card border-circle flex flex-row align-items-center justify-content-center surface-50" style={style}>
-        {/* <ReactImage src={image} alt="Image" width="250" height="250" imageClassName="border-circle" pt={{toolbar: toolbar}} preview indicatorIcon={indicatorIcon}/>   */}
+      <div className="c-image-container p-card border-circle flex flex-row align-items-center justify-content-center surface-50 hover:opacity-50" style={style}>
         {imageURL && imageURL.length > 0 ? (<div>
-          {/* <img src={imageURL} alt="" width={250} height={250} className="border-circle" /> */}
+            <Button className="hover:none" icon="pi pi-pencil text-5xl text-bluegray-100 hover:text-bluegray-200 hover:opacity-50 opacity-0" aria-label="edit profile image" rounded text size="large" tooltip="edit your profile image" tooltipOptions={{ event: "hover" }} />
         </div>) : (
           <div className="c-empty-image-tip flex flex-column align-items-center">
-            <Button className="hover:none" icon="pi pi-plus-circle text-5xl text-bluegray-100 hover:text-bluegray-200" aria-label="add profile image" rounded text size="large" tooltip="Upload your profile image" tooltipOptions={{ event: "hover" }} onClick={(e) => {
+            <Button className="hover:none" icon="pi pi-plus-circle text-5xl text-bluegray-100 hover:text-bluegray-200" aria-label="add profile image" rounded text size="large" tooltip="upload your profile image" tooltipOptions={{ event: "hover" }} onClick={(e) => {
               //@ts-ignore
               if (!dashboardModal.isModalOpen()) {
                 //@ts-ignore
@@ -267,9 +269,9 @@ const Image = () => {
         )
         }
       </div>
-    </>
+    </div>
   );
 };
 
-export { EditImage, AddImage };
-export default Image;
+export { EditProfilePicture, AddProfilePicture};
+export default ProfilePicture;

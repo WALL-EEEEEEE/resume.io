@@ -25,6 +25,7 @@ export class Project  {
 
 export enum Degree {
     NotSpeficifed = "",
+    SelfTaught="Self Taught's",
     HighSchool = "High School's",
     Master = "Master's",
     Bachelor = "Bachelor's",

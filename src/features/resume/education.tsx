@@ -453,7 +453,7 @@ const EducationList = () => {
   const educations = useSelector((state: RootState) => state.resume.resume?.educations)
   const [openAdd, setOpenAdd] = useState(false)
   if (educations === undefined || educations === null) {
-    return
+    return (<></>)
   }
 
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {

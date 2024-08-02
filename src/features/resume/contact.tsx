@@ -171,7 +171,7 @@ const ContactList = () => {
   const menu: MutableRefObject<TieredMenu | null> = useRef(null);
 
   if (contacts === undefined || contacts === null) {
-    return
+    return (<></>)
   }
 
   const add_items = [

@@ -77,7 +77,7 @@ const Project = ({ project, project_id}: { project: ProjectProps, project_id: nu
         project_id={project_id}
       />
       <Card title={title} subTitle={subtitle}>
-        { project.url !== "" && (
+        { project.url !== undefined && project.url !== null && project.url !== "" && (
           <Microlink url={project.url}/>
         )}
         <p dangerouslySetInnerHTML={createMarkup(project.description)}></p>
@@ -365,7 +365,7 @@ const ProjectList = () => {
   const projects = useSelector((state: RootState) => state.resume.resume?.projects)
   const [openAdd, setOpenAdd] = useState(false)
   if (projects === undefined || projects === null) {
-    return
+    return (<></>)
   }
 
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {

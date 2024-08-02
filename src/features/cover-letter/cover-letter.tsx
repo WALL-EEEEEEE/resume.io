@@ -19,7 +19,6 @@ import { editCoverLetter as editCoverLetterAction } from "./cover-letter-slice";
 
 const CoverLetter = () => {
   const coverLetter: CoverLetterProps | undefined  = useSelector((state: RootState) => state["cover-letter"].coverLetter)
-  console.log(coverLetter)
 
   const dayOptions = { year: "numeric", month: "short", day: "numeric" };
   const [date, setDate] = useState(
@@ -51,7 +50,15 @@ const CoverLetter = () => {
       label: "save as PDF",
       icon: 'pi pi-file-pdf',
       command: () => {
-        toPDFDocument("c-letter-container", "letter-conver.pdf")
+        const content_container = document.getElementById("c-letter-content-container")
+        if (content_container  !== null && content_container !== undefined){
+            content_container.style.overflow = "visible"
+        }
+        toPDFDocument("c-letter-container", "letter-conver.pdf").then(() => {
+          if (content_container  !== null && content_container !== undefined){
+              content_container.style.overflow = "scroll"
+          }
+        })
       }
     }
   ]
@@ -78,20 +85,20 @@ const CoverLetter = () => {
   };
 
   return (
+    <div>
     <Panel headerTemplate={headerTemplate} expandIcon={PrimeIcons.ANGLE_DOWN} collapseIcon={PrimeIcons.ANGLE_UP} >
       <EditCoverLetter coverLetter={ coverLetter == undefined ? new CoverLetterProps(): coverLetter } coverLetterId={0} visible={openEdit} setVisible={setOpenEdit} />
-      <div>
         { coverLetter !== undefined && coverLetter !== null ? (
-          <div id="c-letter-container" className="c-letter-container letter-container">
-            <div className="name">{(coverLetter as CoverLetterProps).name}</div>
-            <div className="company">
+          <div id="c-letter-container" className="c-letter-container">
+            <div className="c-name">{(coverLetter as CoverLetterProps).name}</div>
+            <div className="c-company">
               <div className="hiring-manager-name">
                 {(coverLetter as CoverLetterProps).company_info.hiring_manager_name}
               </div>
               <div className="job-title">{(coverLetter as CoverLetterProps).job_title}</div>
               <div className="company-name">{(coverLetter as CoverLetterProps).company_info.name}</div>
             </div>
-            <div className="letter-container">
+            <div id="c-letter-content-container" className="c-letter-content-container">
               <div className="date"> {date} </div>
               <div className="to">
                 Dear {(coverLetter as CoverLetterProps).company_info.hiring_manager_name}
@@ -106,8 +113,9 @@ const CoverLetter = () => {
           </div>
         ) : (<span className="c-empty">No any cover letters added yet.</span>)
         }
-      </div>
     </Panel>
+    </div>
+
   );
 };
 

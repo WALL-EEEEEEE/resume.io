@@ -19,11 +19,12 @@ import { editAbout as editAboutAction } from "./resume-slice"
 const EditAbout = ({ visible, setVisible}: { visible: boolean, setVisible: Dispatch<SetStateAction<boolean>>    }) => {
   const about = useSelector((state: RootState) => state.resume.resume?.about )
   const dispatch = useDispatch<AppDispatch>();
+  let current_about: AboutProps
   if (about === undefined || about === null) {
-      return 
+    current_about = {} as AboutProps
+  } else {
+    current_about = {...about}
   }
-
-  const current_about: AboutProps = {...about}
 
   const saveAbout= () => {
       dispatch(editAboutAction({...current_about}))
@@ -40,7 +41,7 @@ const EditAbout = ({ visible, setVisible}: { visible: boolean, setVisible: Dispa
   return (
       <Dialog header="Edit About" visible={visible} draggable={false} resizable={false} maximizable={true} style={{ width: '50vw' }} onHide={() => {if (!visible) return; setVisible(false); }} footer={footer}>
         <div className="c-editor" >
-          <Editor value={about.desc} onTextChange={(e: EditorTextChangeEvent) => current_about.desc = (e.htmlValue?e.htmlValue:"") }  />
+          <Editor value={current_about.desc} onTextChange={(e: EditorTextChangeEvent) => current_about.desc = (e.htmlValue?e.htmlValue:"") }  />
         </div>
       </Dialog>
   );
@@ -51,7 +52,7 @@ const About = () => {
   const [openEdit, setOpenEdit] = useState(false)
 
   if (about == undefined || about == null) {
-    return
+    return (<></>)
   }
 
   const editClick  = () => {
@@ -75,7 +76,7 @@ const About = () => {
     );
 };
   return (
-    <Panel headerTemplate={headerTemplate} expandIcon={ PrimeIcons.ANGLE_DOWN } collapseIcon = { PrimeIcons.ANGLE_UP} >
+    <Panel headerTemplate={headerTemplate} expandIcon={ PrimeIcons.ANGLE_DOWN } collapseIcon = { PrimeIcons.ANGLE_UP} className="w-full" >
       <EditAbout visible={ openEdit } setVisible={setOpenEdit}/>
       {about.desc && about.desc.length > 0 ? (
         <div dangerouslySetInnerHTML={createMarkup(about.desc)}>
@@ -83,7 +84,6 @@ const About = () => {
         <span className="c-empty">No any summary about yourself added yet.</span>
       )
       }
-
       </Panel>
   );
 };

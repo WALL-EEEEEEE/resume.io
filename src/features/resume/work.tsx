@@ -469,7 +469,7 @@ const WorkList = () => {
   const works =  useSelector((state: RootState) => state.resume.resume?.works )
   const [openAdd, setOpenAdd] = useState(false)
   if (works === undefined || works == null) {
-    return
+    return (<></>)
   }
 
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {

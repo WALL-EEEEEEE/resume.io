@@ -16,7 +16,7 @@ const SkillList = () => {
   const skills = useSelector((state: RootState) => state.resume.resume?.skills)
   const dispatch = useDispatch<AppDispatch>()
   if (skills == undefined || skills == null) {
-    return
+    return (<></>)
   }
 
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {
