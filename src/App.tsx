@@ -12,6 +12,8 @@ import { Provider } from "react-redux";
 import "./styles/app.css"
 import { persistor, store } from "./store";
 import { PersistGate } from "redux-persist/integration/react";
+import { JobPanel } from "./features/panel/job";
+import { ResumePanel } from "./features/panel/resume";
 
 
 function App() {
@@ -21,12 +23,12 @@ function App() {
       element: <Index />,
       children: [
         {
-          path: "cover_letter",
-          element: <CoverLetter />,
+          path: "panel/job",
+          element: <JobPanel />,
         },
         {
-          path: "resume",
-          element: <Resume />,
+          path: "panel/resume",
+          element: <ResumePanel />,
         }
       ]
     }

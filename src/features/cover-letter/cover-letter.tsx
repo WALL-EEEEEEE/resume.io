@@ -226,5 +226,9 @@ function EditCoverLetter({ coverLetter, coverLetterId, visible, setVisible }: { 
 
 }
 
+function CoverLetterList () {
+  return (<></>)
+}
+
 export default CoverLetter;
 export { EditCoverLetter };

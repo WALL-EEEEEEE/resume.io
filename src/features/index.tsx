@@ -5,14 +5,11 @@ import { Outlet, useNavigate } from "react-router-dom";
 const Index = () => {
    const navigate = useNavigate()
   const tab_menus: MenuItem[] = [
-    { label: "Resume", icon:"pi pi-book", command: (e) => {
-        navigate("resume")
-    } },
-    { label: "Cover Letter", icon:"pi pi-envelope", command: (e) => {
-        navigate("cover_letter")
+    { label: "Resume Panel", icon:"pi pi-book", command: (e) => {
+        navigate("panel/resume")
     } },
     { label: "Job Panel", icon:"pi pi-briefcase", disabled: true, command: (e) => {
-        navigate("jobs")
+        navigate("panel/job")
     } },
 
   ]

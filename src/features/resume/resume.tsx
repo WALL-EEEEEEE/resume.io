@@ -145,4 +145,8 @@ const Resume = () => {
   );
 };
 
+const ResumeList = () => {
+  return (<></>)
+}
+
 export default Resume;

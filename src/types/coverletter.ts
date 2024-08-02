@@ -1,4 +1,14 @@
+export class CoverLetterMeta {
+   id?: string = ""
+   name?: string = ""
+   category?: string = ""
+   status?: string = ""
+   createdTime?:Date
+   updatedTime?:Date
+
+}
 export class CoverLetter  {
+    meta: CoverLetterMeta = {}
     name: string = ""
     job_title: string = ""
     address: string = ""
