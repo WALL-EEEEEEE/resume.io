@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import { toCanvas } from 'html-to-image'
+import { createFile } from "./opfs";
 
 const pixel_to_mm = 0.2645833333
 
@@ -23,10 +24,13 @@ export class PDFSize {
 }
 
 
-export async function toPDFDocument(element: string, path: string, size: PageSize = PDFSize.A4) {
+export async function toPDFDocument(element: string): Promise<URL> {
+    if (element.length === 0 ) {
+        throw `element selector can't be empty`
+    }
     const pdf_element = document.getElementById(element);
     if (pdf_element === undefined || pdf_element === null) {
-        return
+        throw `element ${element} not exists`
     }
     //@ts-ignore
     const canvas = await toCanvas(pdf_element)
@@ -45,7 +49,22 @@ export async function toPDFDocument(element: string, path: string, size: PageSiz
         });
         const pdf_padding_left = (pdf_width - canvas_width)/2
         pdf.addImage(imgData, 'JPEG', pdf_padding_left, pdf_padding_top, canvas_width , canvas_height);
-        pdf.save(path);
+        return pdf.output("bloburl")
       };
-    imageToPDF(canvas)
+    return imageToPDF(canvas)
   }
+
+export async function downloadAsPDF(element_selector: string, name: string) {
+  const blobURL = await toPDFDocument(element_selector)
+  const fakePDFLink = document.createElement('a')
+  fakePDFLink.href = blobURL.toString()
+  fakePDFLink.download = name
+  fakePDFLink.click()
+}
+
+export async function saveAsPDF(element_selector: string, name:string) {
+  const blobURL = await toPDFDocument(element_selector)
+  const blobResp = await fetch(blobURL)
+  const blob =  await blobResp.blob()
+  await createFile(name, await blob.arrayBuffer())
+}

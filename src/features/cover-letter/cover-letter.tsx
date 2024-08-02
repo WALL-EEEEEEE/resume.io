@@ -2,7 +2,7 @@
 import "./cover-letter.css";
 import { CoverLetter as CoverLetterProps } from "../../types/coverletter"
 import { createMarkup } from "../../utils/html";
-import { toPDFDocument } from "../../utils/pdf"
+import { downloadAsPDF, saveAsPDF, toPDFDocument } from "../../utils/pdf"
 import { Dispatch, MutableRefObject, SetStateAction, useRef, useState } from "react";
 import { Editor, EditorTextChangeEvent } from 'primereact/editor';
 import mustache from "mustache";
@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { editCoverLetter as editCoverLetterAction } from "./cover-letter-slice";
 
+const LETTER_COVER_PDF_NAME = "letter-conver.pdf"
 
 const CoverLetter = () => {
   const coverLetter: CoverLetterProps | undefined  = useSelector((state: RootState) => state["cover-letter"].coverLetter)
@@ -47,18 +48,25 @@ const CoverLetter = () => {
   const option_menu: MutableRefObject<TieredMenu | null> = useRef(null);
   const option_items: MenuItem[] = [
     {
-      label: "save as PDF",
-      icon: 'pi pi-file-pdf',
+      label: "download as PDF",
+      icon: 'pi pi-download',
       command: () => {
-        const content_container = document.getElementById("c-letter-content-container")
-        if (content_container  !== null && content_container !== undefined){
-            content_container.style.overflow = "visible"
-        }
-        toPDFDocument("c-letter-container", "letter-conver.pdf").then(() => {
-          if (content_container  !== null && content_container !== undefined){
-              content_container.style.overflow = "scroll"
-          }
-        })
+         downloadAsPDF("c-letter-container", LETTER_COVER_PDF_NAME).then(() => {
+          console.log("save cover letter as PDF document successfully")
+        }).catch((e) => {
+          console.trace(`error occur while saving cover letter as PDF document`, e)
+        }) 
+      }
+    },
+    {
+      label: "upload as PDF",
+      icon: 'pi pi-cloud-upload',
+      command: () => {
+         saveAsPDF("c-letter-container", ["pdfs", LETTER_COVER_PDF_NAME].join("/")).then(() => {
+          console.log("save cover letter as PDF document successfully")
+        }).catch((e) => {
+          console.trace(`error occur while saving cover letter as PDF document`, e)
+        }) 
       }
     }
   ]

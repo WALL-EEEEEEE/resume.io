@@ -10,11 +10,12 @@ import { PrimeIcons } from "primereact/api";
 import { TieredMenu } from "primereact/tieredmenu";
 import { MutableRefObject, useRef } from "react";
 import { MenuItem } from "primereact/menuitem";
-import { toPDFDocument } from "../../utils/pdf";
+import { saveAsPDF, downloadAsPDF } from "../../utils/pdf";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { initProject as initProjectAction, initWork as initWorkAction, initEducation as initEducationAction, initAbout as initAboutAction, initContact as initContactAction, initSkill as initSkillAction, initProfilePicture as initProfilePictureAction } from "./resume-slice";
 
+const RESUME_PDF = "resume.pdf"
 
 const Resume = () => {
   const resume = useSelector((state: RootState) => state.resume)
@@ -68,12 +69,27 @@ const Resume = () => {
   const option_menu: MutableRefObject<TieredMenu | null> = useRef(null);
   const option_items: MenuItem[] = [
     {
-      label: "save as PDF",
-      icon: 'pi pi-file-pdf',
+      label: "download as PDF",
+      icon: 'pi pi-download',
       command: () => {
-        toPDFDocument("c-resume-container", "resume.pdf")
+        downloadAsPDF("c-resume-container", RESUME_PDF).then(() => {
+          console.log("downloaded resume as PDF document successfully")
+        }).catch((e) => {
+          console.trace(`error occur while downloading resume as PDF document`, e)
+        })
       }
-    }
+    },
+    {
+      label: "upload as PDF",
+      icon: 'pi pi-cloud-upload',
+      command: () => {
+         saveAsPDF("c-resume-container", ["pdfs",RESUME_PDF].join("/")).then(() => {
+          console.log("save resume as PDF document successfully")
+        }).catch((e) => {
+          console.trace(`error occur while saving resume as PDF document`, e)
+        })    
+      }
+    },
   ]
 
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {
