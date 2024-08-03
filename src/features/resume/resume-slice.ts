@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Resume, About, Project, Work, Skill, Education, Contact } from "../../types/resume";
 
-interface ResumeState {
+export interface ResumeState {
     resume:Resume 
 }
 
@@ -147,5 +147,4 @@ const resumeSlice = createSlice({
 })
 
 export const { initProfilePicture, initProject, initWork, initEducation, initContact, initAbout, initSkill, addProject, delProject, editProject, addWork, delWork, editWork, addEducation, delEducation, editEducation, delSkill, addSkill, addContact, delContact, editContact,  editAbout, addProfilePicture, editProfilePicture, delProfilePicture} = resumeSlice.actions
-
 export default resumeSlice.reducer;

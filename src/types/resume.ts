@@ -1,14 +1,14 @@
 export class ResumeMeta {
-    id?: string
-    name?: string
-    category?: string
+    id: string = ""
+    name: string = ""
+    category?: string[]
     status?:string
     createdTime?:Date
     updatedTime?:Date
 }
 
 export class Resume  {
-    meta: ResumeMeta = {}
+    meta: ResumeMeta = new ResumeMeta()
     profileImage?:string 
     about?: About
     projects?: Project[]

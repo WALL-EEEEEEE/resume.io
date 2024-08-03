@@ -14,11 +14,15 @@ import { saveAsPDF, downloadAsPDF } from "../../utils/pdf";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { initProject as initProjectAction, initWork as initWorkAction, initEducation as initEducationAction, initAbout as initAboutAction, initContact as initContactAction, initSkill as initSkillAction, initProfilePicture as initProfilePictureAction } from "./resume-slice";
+import { v7 as uuidv7 } from "uuid"
 
 const RESUME_PDF = "resume.pdf"
 
-const Resume = () => {
-  const resume = useSelector((state: RootState) => state.resume)
+const Resume = ({ id }:{id?: string}) => {
+  // const resume = useSelector((state: RootState) => state.resume)
+  if (id === undefined ){
+      id = uuidv7()
+  }
   const dispatch = useDispatch<AppDispatch>()
   const add_menu: MutableRefObject<TieredMenu | null> = useRef(null);
   const add_items: MenuItem[] = [

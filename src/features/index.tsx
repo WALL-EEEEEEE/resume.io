@@ -1,17 +1,38 @@
 import { TabMenu } from "primereact/tabmenu";
 import { MenuItem } from "primereact/menuitem";
 import { Outlet, useNavigate } from "react-router-dom";
+import "primereact/resources/themes/lara-light-blue/theme.css";  //theme
+import "primereact/resources/primereact.min.css";                  //core css
+import "primeicons/primeicons.css";                                //icons
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store";
+import { addUser as createUserAction } from "./user/user-list-slice";
+import { authLogin as authLoginAction } from "./user/auth-slice";
+import { User as UserProps }  from "../types/user";
+
+function createFakeUser() {
+    const fakeUser = new UserProps();
+    fakeUser.id = "0191167e-d0e1-7ddf-92db-01b7e9c07724"
+    fakeUser.name = "Wall'e"
+    fakeUser.password = "666666"
+    return fakeUser
+}
 
 const Index = () => {
-   const navigate = useNavigate()
+  //fake auth
+  const user = createFakeUser()
+  const dispatch = useDispatch<AppDispatch>()
+  dispatch(createUserAction(user))
+  dispatch(authLoginAction(user.id)) 
+
+  const navigate = useNavigate()
   const tab_menus: MenuItem[] = [
     { label: "Resume Panel", icon:"pi pi-book", command: (e) => {
-        navigate("panel/resume")
+        navigate("resume")
     } },
     { label: "Job Panel", icon:"pi pi-briefcase", disabled: true, command: (e) => {
-        navigate("panel/job")
+        navigate("job")
     } },
-
   ]
   return (
     <div className="c-app flex flex-column align-items-center">

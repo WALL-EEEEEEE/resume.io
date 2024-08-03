@@ -1,7 +1,7 @@
 import {  createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CoverLetter } from "../../types/coverletter";
 
-type CoverLetterState = {
+export type CoverLetterState = {
     coverLetter?: CoverLetter 
 }
 
@@ -24,3 +24,5 @@ const coverLetterSlice = createSlice({
 export const { editCoverLetter } = coverLetterSlice.actions
 
 export default coverLetterSlice.reducer;
+
+export {coverLetterSlice as coverLetterState }

@@ -1,6 +1,6 @@
 export class CoverLetterMeta {
-   id?: string = ""
-   name?: string = ""
+   id: string = ""
+   name: string = ""
    category?: string = ""
    status?: string = ""
    createdTime?:Date
@@ -8,7 +8,7 @@ export class CoverLetterMeta {
 
 }
 export class CoverLetter  {
-    meta: CoverLetterMeta = {}
+    meta: CoverLetterMeta = new CoverLetterMeta()
     name: string = ""
     job_title: string = ""
     address: string = ""

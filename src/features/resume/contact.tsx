@@ -2,7 +2,6 @@ import { PrimeIcons } from "primereact/api";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { ContactKind, Contact as ContactProps, Phone } from "../../types/resume";
 import { Dispatch, MutableRefObject, SetStateAction, useRef, useState } from "react";
-import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";

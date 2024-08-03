@@ -1,0 +1,10 @@
+.c-resume-edit-icon {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 1500ms;
+}
+
+.c-panel-item:hover .c-resume-edit-icon {
+    visibility: visible;
+    opacity: 1;
+}

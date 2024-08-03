@@ -43,7 +43,6 @@ export async function getFile(name: string): Promise<null|FileSystemFileHandle> 
     const path_hierarchy = name.split("/")
     let rootEntry: FileSystemHandle = opfs
     for (const subpath of path_hierarchy) {
-        console.log(subpath, rootEntry)
         let matched = false
         //@ts-ignore
         for await (let[name, handle]  of rootEntry.entries()) {

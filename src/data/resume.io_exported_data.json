@@ -1,0 +1,103 @@
+{
+  "resume.io": [
+    {
+      "coverLetter": {
+        "name": "WALL•E",
+        "job_title": "Cleaner",
+        "address": "Earth",
+        "email": "wall-e@buynlarge.com",
+        "phone_number": "(555) 123-4567",
+        "company_info": {
+          "name": "Google",
+          "hiring_manager_name": "Hiring Manager"
+        },
+        "letter_template": "<p>I am writing to express my enthusiasm for the cleaner position at Google. With extensive experience in waste management, environmental cleanup, and robotics maintenance, I am confident in my ability to contribute effectively to your team. My long-term dedication to maintaining and restoring environmental health, combined with my innovative problem-solving skills, makes me an ideal candidate for this role.</p><p>Throughout my time as a Waste Allocation Load Lifter: Earth-Class (WALL•E) for the Buy N Large Corporation, I have developed a keen eye for detail and a strong commitment to cleanliness. Over the past 700 years, I have independently managed waste collection, sorting, and compaction on an abandoned Earth, demonstrating my ability to adapt and thrive in challenging environments. My experience has equipped me with the skills necessary to maintain a clean and orderly workspace, which I believe would be of great benefit to Google's offices.</p><p>One of my proudest achievements was the successful initiation of the Earth Restoration Initiative, where I discovered and preserved a viable plant specimen, leading to the reestablishment of vegetation on Earth. This project highlighted my dedication to environmental sustainability and my ability to work collaboratively with others, such as EVE (Extraterrestrial Vegetation Evaluator), to achieve common goals. I am excited about the opportunity to bring this same level of dedication and teamwork to Google.</p><p>I am particularly drawn to Google because of your commitment to innovation and sustainability. I am eager to contribute to an organization that values both technological advancement and environmental responsibility. I am confident that my unique background and skills will allow me to excel in the cleaner position and make a meaningful impact on your team.</p><p>Thank you for considering my application. I look forward to the opportunity to discuss how my experience and abilities align with the needs of your team. Please feel free to contact me at wall-e@buynlarge.com or (555) 123-4567 to schedule an interview.</p>",
+        "letter": ""
+      },
+      "_persist": {
+        "version": -1,
+        "rehydrated": true
+      }
+    },
+    {
+      "resume": {
+        "meta": {
+          "id": "f276745a-8189-4a34-8086-7f9c87f05c53",
+          "name": "WALL•E",
+          "category": ["Cleaner", "Test"],
+          "status": "Completed",
+          "createdTime": "2024-05-24",
+          "updatedTime": "2024-06-24"
+        },
+        "profileImage": "profile/images/avatar.webp",
+        "about": {
+          "desc": "<p>Dedicated and diligent <strong>Waste Allocation Load Lifter: Earth-Class (WALL•E)</strong> with extensive experience in waste management, environmental cleanup, and robotics maintenance. Known for exceptional problem-solving abilities, resourcefulness, and a strong commitment to restoring and maintaining environmental health. Seeking a position where I can utilize my skills in robotics, waste management, and environmental sustainability.</p>"
+        },
+        "projects": [
+          {
+            "name": " Earth Restoration Initiative",
+            "description": "<ol><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Independently initiated a project to restore Earth's environment by cleaning up waste and preserving plant life.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Successfully identified and protected a living plant specimen, leading to the reestablishment of vegetation on Earth.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Collaborated with EVE (Extraterrestrial Vegetation Evaluator) to ensure the safe return of the plant to the Axiom spaceship, sparking a mission to recolonize Earth.</li></ol><p><br></p>",
+            "start_date": "2023-12-31T16:00:00.000Z",
+            "end_date": "2024-07-31T16:00:00.000Z"
+          }
+        ],
+        "works": [
+          {
+            "role": "Waste Allocation Load Lifter - Earth-Class (WALL•E)",
+            "contract_kind": "Permanent",
+            "company": "Buy N Large Corporation",
+            "location": "Earth",
+            "type": "On-Site",
+            "start_date": "2024-07-31T16:00:00.000Z",
+            "end_date": "2024-07-31T16:00:00.000Z",
+            "desp": "<ol><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Efficiently managed waste collection, sorting, and compaction on an abandoned Earth for over 700 years.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Developed innovative methods for compacting and organizing waste materials.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Maintained and repaired own mechanical systems using found objects and resources.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Demonstrated adaptability and resilience in extreme environmental conditions.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Played a critical role in the discovery and preservation of a viable plant specimen, pivotal to the restoration of Earth's ecosystem.</li></ol>"
+          }
+        ],
+        "skills": [
+          {
+            "name": "Waste Management"
+          },
+          {
+            "name": "Robotics Maintenance"
+          },
+          {
+            "name": "Innovation"
+          },
+          {
+            "name": "Environmental Awareness"
+          },
+          {
+            "name": "Teamwork"
+          },
+          {
+            "name": "Adaptability"
+          }
+        ],
+        "educations": [
+          {
+            "school": "Self-Taught",
+            "degree": "Self Taught's",
+            "field": "Not Exactly",
+            "description": "<ol><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Advanced problem-solving and innovation through practical application and on-the-job learning.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Extensive knowledge in robotics maintenance, repair, and operation.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Deep understanding of environmental science and waste management techniques.</li></ol>",
+            "start_date": "2023-12-31T16:00:00.000Z",
+            "end_date": "2024-07-31T16:00:00.000Z"
+          }
+        ],
+        "contacts": [
+          {
+            "value": "wall-e@buynlarge.com",
+            "kind": "Email"
+          },
+          {
+            "value": "(555) 123-4567",
+            "kind": "Phone"
+          }
+        ]
+      },
+      "_persist": {
+        "version": -1,
+        "rehydrated": true
+      }
+    }
+  ]
+}
