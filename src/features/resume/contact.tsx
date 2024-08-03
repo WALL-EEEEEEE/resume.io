@@ -163,7 +163,8 @@ function EditContact({
 }
 
 const ContactList = () => {
-  const contacts = useSelector((state: RootState) => state.resume.resume?.contacts)
+  const contacts :ContactProps[] = []
+  // const contacts = useSelector((state: RootState) => state.resume.resume?.contacts)
   const dispatch = useDispatch<AppDispatch>()
   const [addContactKind, setAddContactKind] = useState(ContactKind.NotSpecified)
   const [openAdd, setOpenAdd] = useState(false);

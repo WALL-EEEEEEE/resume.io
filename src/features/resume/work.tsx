@@ -466,7 +466,9 @@ function EditWork({
 }
 
 const WorkList = () => {
-  const works =  useSelector((state: RootState) => state.resume.resume?.works )
+  // const works =  useSelector((state: RootState) => state.resume.resume?.works )
+  let works = undefined
+
   const [openAdd, setOpenAdd] = useState(false)
   if (works === undefined || works == null) {
     return (<></>)

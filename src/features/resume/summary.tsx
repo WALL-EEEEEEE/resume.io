@@ -48,8 +48,9 @@ const EditAbout = ({ visible, setVisible}: { visible: boolean, setVisible: Dispa
 };
 
 const About = () => {
-  const about = useSelector((state: RootState) => state.resume.resume?.about )
+  // const about = useSelector((state: RootState) => state.resume.resume?.about )
   const [openEdit, setOpenEdit] = useState(false)
+  let about = undefined
 
   if (about == undefined || about == null) {
     return (<></>)

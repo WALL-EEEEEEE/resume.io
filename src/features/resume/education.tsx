@@ -450,7 +450,8 @@ function EditEducation({
 }
 
 const EducationList = () => {
-  const educations = useSelector((state: RootState) => state.resume.resume?.educations)
+  const educations: EducationProps[] = []
+  // const educations = useSelector((state: RootState) => state.resume.resume?.educations)
   const [openAdd, setOpenAdd] = useState(false)
   if (educations === undefined || educations === null) {
     return (<></>)

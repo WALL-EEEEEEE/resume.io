@@ -159,7 +159,8 @@ function EditProfilePicture({
 }
 
 const ProfilePicture = () => {
-  const image = useSelector((state: RootState) => state.resume.resume?.profileImage)
+  // const image = useSelector((state: RootState) => state.resume.resume?.profileImage)
+  const image = undefined
   const [imageURL, setImageURL] = useState("")
   const dispatch = useDispatch<AppDispatch>();
 

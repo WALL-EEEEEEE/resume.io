@@ -13,7 +13,8 @@ import { delSkill as delSkillAction, addSkill as addSkillAction } from "./resume
 
 const SkillList = () => {
   const [openAdd, setOpenAdd] = useState(false)
-  const skills = useSelector((state: RootState) => state.resume.resume?.skills)
+  // const skills = useSelector((state: RootState) => state.resume.resume?.skills)
+  const skills: SkillProps[] =  []
   const dispatch = useDispatch<AppDispatch>()
   if (skills == undefined || skills == null) {
     return (<></>)

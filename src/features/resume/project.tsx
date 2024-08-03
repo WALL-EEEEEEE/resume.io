@@ -362,7 +362,8 @@ function EditProject({
 }
 
 const ProjectList = () => {
-  const projects = useSelector((state: RootState) => state.resume.resume?.projects)
+  // const projects = useSelector((state: RootState) => state.resume.resume?.projects)
+  const projects: ProjectProps[] = []
   const [openAdd, setOpenAdd] = useState(false)
   if (projects === undefined || projects === null) {
     return (<></>)
