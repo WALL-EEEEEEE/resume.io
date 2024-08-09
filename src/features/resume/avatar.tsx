@@ -1,23 +1,15 @@
-import { PrimeIcons } from "primereact/api";
-import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
-import { Dispatch, HTMLAttributes, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { TieredMenu } from "primereact/tieredmenu";
-import { ImagePassThroughType, Image as ReactImage } from "primereact/image";
-import { IconType } from "primereact/utils";
-import { DashboardModal, DashboardModal as ImageUploadModal } from "@uppy/react";
 import englishLocale from '@uppy/locales/lib/en_US';
 import ImageEditor from '@uppy/image-editor';
 import Uppy from '@uppy/core';
 import '@uppy/core/dist/style.min.css';
 import '@uppy/dashboard/dist/style.min.css';
 import '@uppy/webcam/dist/style.min.css';
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
 import { createFile, getFile } from "../../utils/opfs";
-import { addProfilePicture as addProfilePictureAction, editProfilePicture as editProfilePictureAction, delProfilePicture as delProfilePictureAction} from "./resume-slice";
 import Dashboard from "@uppy/dashboard/lib/Dashboard";
+import { useResumeEditorContext } from "./context";
 
 const profileImagesDirector = "profile/images"
 
@@ -159,10 +151,9 @@ function EditProfilePicture({
 }
 
 const ProfilePicture = () => {
-  // const image = useSelector((state: RootState) => state.resume.resume?.profileImage)
-  const image = undefined
-  const [imageURL, setImageURL] = useState("")
-  const dispatch = useDispatch<AppDispatch>();
+  const {draft, setImage} = useResumeEditorContext()
+  const image = draft?.profileImage
+  const [imageURL, setImageURL] = useState(image)
 
   const updateURL = async () => {
     if (image !== undefined && image !== null) {
@@ -174,8 +165,8 @@ const ProfilePicture = () => {
   }
   useEffect(() => { updateURL() }, [image])
 
-  const [uppy] = useState(() => new Uppy({
-    id: "profile-image-upload",
+  const [uppy, setUppy] = useState(() => new Uppy({
+    id: "c-image-uploader",
     allowMultipleUploadBatches: false,
     restrictions: {
       maxNumberOfFiles: 1,
@@ -211,7 +202,7 @@ const ProfilePicture = () => {
         },
       }
     },
-  }).use(ImageEditor).use(Dashboard));
+  }).use(ImageEditor).use(Dashboard, {target: "#c-image-uploader"}));
 
   if (image === null || image === undefined) {
     return (<></>)
@@ -230,7 +221,7 @@ const ProfilePicture = () => {
     } catch (err) {
       console.trace(err)
     }
-    dispatch(addProfilePictureAction(storePath))
+    setImage(storePath)
     //@ts-ignore
      if (dashboardModal.isModalOpen()) {
         //@ts-ignore
@@ -241,19 +232,6 @@ const ProfilePicture = () => {
 
   return (
     <div className="c-avatar-image border-circle flex flex-row align-items-center">
-      {/* <EditImage
-          image={image}
-          setImage={setImage}
-          visible={openAdd}
-          setVisible={setOpenAdd}
-      /> */}
-      {/* <ImageUploadModal
-        uppy={uppy}
-        open={openImageUploader}
-        singleFileFullScreen
-        proudlyDisplayPoweredByUppy={false}
-      /> */}
-      <div id="c-image-uploader" className="c-image-uploader"></div>
       <div className="c-image-container p-card border-circle flex flex-row align-items-center justify-content-center surface-50 hover:opacity-50" style={style}>
         {imageURL && imageURL.length > 0 ? (<div>
             <Button className="hover:none" icon="pi pi-pencil text-5xl text-bluegray-100 hover:text-bluegray-200 hover:opacity-50 opacity-0" aria-label="edit profile image" rounded text size="large" tooltip="edit your profile image" tooltipOptions={{ event: "hover" }} />

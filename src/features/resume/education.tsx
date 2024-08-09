@@ -1,7 +1,7 @@
 import { PrimeIcons } from "primereact/api";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { Degree, Education as EducationProps } from "../../types/resume"
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 import { Card } from "primereact/card";
 import { EnumToObjects } from "../../utils/enum";
 import { Button } from "primereact/button";
@@ -11,13 +11,13 @@ import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Editor, EditorTextChangeEvent } from "primereact/editor";
 import { createMarkup } from "../../utils/html";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
-import { editEducation as editEducationAction, addEducation as addEducationAction, delEducation as delEducationAction, editEducation} from "./resume-slice"
+import { v7 as uuidv7 } from "uuid"
+import { durationInMonths } from "../../utils/date";
+import { useResumeEditorContext } from "./context";
 
 
-const Education = ({ education, education_id }: { education: EducationProps, education_id: number }) => {
-  const dispatch = useDispatch<AppDispatch>();
+const Education = ({ education }: { education: EducationProps }) => {
+  const { delEducation } = useResumeEditorContext()
   const [openEdit, setOpenEdit] = useState(false);
 
   const title = () => {
@@ -34,7 +34,7 @@ const Education = ({ education, education_id }: { education: EducationProps, edu
 
           <span
             className="pi pi-trash"
-            onClick={() => dispatch(delEducationAction(education_id)) }
+            onClick={() => delEducation(education.id) }
           ></span>
         </div>
       </div>
@@ -52,11 +52,12 @@ const Education = ({ education, education_id }: { education: EducationProps, edu
       // @ts-ignore
       dayOptions
     );
+    const last = durationInMonths(start_date, end_date)
 
     return (
       <div className="flex flex-column gap-2 text-sm">
         <span>{education.degree+ ", " + education.field}</span>
-        <span> {start_date + " - " + end_date } </span>
+        <span> {start_date + " - " + end_date + " , "+ last} </span>
       </div>
     );
   };
@@ -67,7 +68,6 @@ const Education = ({ education, education_id }: { education: EducationProps, edu
         visible={openEdit}
         setVisible={setOpenEdit}
         education={education}
-        education_id={education_id}
       />
       <Card title={title} subTitle={subtitle}>
         <p dangerouslySetInnerHTML={createMarkup(education.description)}></p>
@@ -83,10 +83,11 @@ function AddEducation({
   visible: boolean,
   setVisible: Dispatch<SetStateAction<boolean>>,
 }) {
-  const degree_types = EnumToObjects(Degree).filter( (item) => item.value !== Degree.NotSpeficifed);
-  const dispatch = useDispatch<AppDispatch>();
+  const { addEducation } =  useResumeEditorContext()
 
-  const [newEducation, setNewEducation]:[EducationProps, Dispatch<SetStateAction<EducationProps>>] = useState({} as EducationProps);
+  const degree_types = EnumToObjects(Degree).filter( (item) => item.value !== Degree.NotSpeficifed);
+
+  const [editingEducation, setEditingEducation]:[EducationProps, Dispatch<SetStateAction<EducationProps>>] = useState({} as EducationProps);
 
   const footer = (
     <div className="c-actions">
@@ -94,7 +95,7 @@ function AddEducation({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addEducationAction({...newEducation}))
+          addEducation({...editingEducation, id: uuidv7()})
           setVisible(false);
         }}
       />
@@ -134,9 +135,9 @@ function AddEducation({
             <InputText
               id="education-school"
               className="p-inputtext-sm"
-              value={newEducation.school===""?null: newEducation.school}
+              value={editingEducation.school===""?null: editingEducation.school}
               onChange={ (e) =>  {
-                setNewEducation({...newEducation, school: e.target.value})
+                setEditingEducation({...editingEducation, school: e.target.value})
               }}
               placeholder="Ex: Stanford"
             />
@@ -148,9 +149,9 @@ function AddEducation({
             </label>
             <Dropdown
               id="education-degree"
-              value={newEducation.degree === Degree.NotSpeficifed? null: newEducation.degree}
+              value={editingEducation.degree === Degree.NotSpeficifed? null: editingEducation.degree}
               onChange={(e) => { 
-                setNewEducation({...newEducation, degree: e.value})
+                setEditingEducation({...editingEducation, degree: e.value})
               }}
               options={degree_types}
               optionLabel="label"
@@ -166,9 +167,9 @@ function AddEducation({
             <InputText
               id="education-field"
               className="p-inputtext-sm"
-              value={newEducation.field === ""? null: newEducation.field}
+              value={editingEducation.field === ""? null: editingEducation.field}
               placeholder="Ex: Computer Science"
-              onChange={ (e) => setNewEducation({...newEducation, field: e.target.value }) }
+              onChange={ (e) => setEditingEducation({...editingEducation, field: e.target.value }) }
             />
           </div>
 
@@ -179,9 +180,9 @@ function AddEducation({
             <Calendar
               id="education-start-date"
               className="p-inputtext-sm"
-              value={ newEducation.start_date }
+              value={ editingEducation.start_date }
               onChange={(e) => {
-                setNewEducation({...newEducation, start_date: e.value?e.value: newEducation.start_date})
+                setEditingEducation({...editingEducation, start_date: e.value?e.value: editingEducation.start_date})
               }}
               showIcon
               maxDate={new Date()}
@@ -200,9 +201,9 @@ function AddEducation({
             <Calendar
               id="end-date"
               className="p-inputtext-sm"
-              value={ newEducation.end_date }
+              value={ editingEducation.end_date }
               onChange={(e) => {
-                setNewEducation({...newEducation, end_date: e.value?e.value: newEducation.end_date})
+                setEditingEducation({...editingEducation, end_date: e.value?e.value: editingEducation.end_date})
               }}
               showIcon
               maxDate={new Date()}
@@ -221,9 +222,9 @@ function AddEducation({
             <InputText
               id="education-grade"
               className="p-inputtext-sm"
-              value={newEducation.grade === 0 ? null: newEducation.grade?.toString()}
+              value={editingEducation.grade === 0 ? null: editingEducation.grade?.toString()}
               onChange={ (e) =>  {
-                setNewEducation({...newEducation, grade: parseFloat(e.target.value)})
+                setEditingEducation({...editingEducation, grade: parseFloat(e.target.value)})
               }}
               placeholder="Ex: 7.5"
             />
@@ -236,9 +237,9 @@ function AddEducation({
             <InputText
               id="education-activity"
               className="p-inputtext-sm"
-              value={newEducation.activities === "" ?null: newEducation.activities}
+              value={editingEducation.activities === "" ?null: editingEducation.activities}
               onChange={ (e) =>  {
-                setNewEducation({...newEducation, activities: e.target.value})
+                setEditingEducation({...editingEducation, activities: e.target.value})
               }}
               placeholder="Ex: Alpha Phi Omega, Marching Band, Volleyball"
             />
@@ -250,10 +251,11 @@ function AddEducation({
             </label>
             <Editor
               id="description"
-              value={newEducation.description?newEducation.description: ""}
+              value={editingEducation.description?editingEducation.description: ""}
               onTextChange={(e: EditorTextChangeEvent) =>
-                setNewEducation({...newEducation, description: e.htmlValue ? e.htmlValue : ""})
+                setEditingEducation({...editingEducation, description: e.htmlValue ? e.htmlValue : ""})
               }
+              style={{ height: '320px' }}
             />
           </div>
         </div>
@@ -264,18 +266,16 @@ function AddEducation({
 
 function EditEducation({
   education,
-  education_id,
   visible,
   setVisible,
 }: {
   education: EducationProps;
-  education_id: number,
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
 }) {
-  const [editEducation, setEditEducation]: [EducationProps, Dispatch<SetStateAction<EducationProps>>] = useState(education);
+  const {editEducation} = useResumeEditorContext()
+  const [editingEducation, setEditingEducation]: [EducationProps, Dispatch<SetStateAction<EducationProps>>] = useState(education);
   const degrees = EnumToObjects(Degree).filter((item) => { return item.value !== Degree.NotSpeficifed });
-  const dispatch = useDispatch<AppDispatch>();
 
   const footer = (
     <>
@@ -283,7 +283,7 @@ function EditEducation({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(editEducationAction([{...editEducation}, education_id]))
+          editEducation(editingEducation.id, editingEducation)
           setVisible(false);
         }}
       />
@@ -322,9 +322,9 @@ function EditEducation({
           <InputText
             id="education-school"
             className="p-inputtext-sm"
-            value={editEducation.school}
+            value={editingEducation.school}
             required
-            onChange={ (e) => setEditEducation({...editEducation,  school: e.target.value? e.target.value: editEducation.school})}
+            onChange={ (e) => setEditingEducation({...editingEducation,  school: e.target.value? e.target.value: editingEducation.school})}
           />
         </div>
 
@@ -334,10 +334,10 @@ function EditEducation({
           </label>
           <Dropdown
             id="education-degree"
-            value={editEducation.degree}
+            value={editingEducation.degree}
             onChange={(e) => {
               // console.log(e.value)
-              setEditEducation({...editEducation, degree: e.value})
+              setEditingEducation({...editingEducation, degree: e.value})
             }}
             options={degrees}
             optionLabel="label"
@@ -354,10 +354,10 @@ function EditEducation({
           <InputText
             id="education-field"
             className="p-inputtext-sm"
-            value={editEducation.field}
+            value={editingEducation.field}
             required
             onChange={ (e) => {
-              setEditEducation({...editEducation, field: e.target.value? e.target.value: editEducation.field})
+              setEditingEducation({...editingEducation, field: e.target.value? e.target.value: editingEducation.field})
             }}
           />
         </div>
@@ -369,9 +369,9 @@ function EditEducation({
             <InputText
               id="education-grade"
               className="p-inputtext-sm"
-              value={editEducation.grade?.toFixed(1) }
+              value={editingEducation.grade?.toFixed(1) }
               onChange={ (e) =>  {
-                setEditEducation({...editEducation, grade: parseFloat(e.target.value)})
+                setEditingEducation({...editingEducation, grade: parseFloat(e.target.value)})
               }}
               placeholder="Ex: 7.5"
             />
@@ -384,9 +384,9 @@ function EditEducation({
             <InputText
               id="education-activity"
               className="p-inputtext-sm"
-              value={editEducation.activities}
+              value={editingEducation.activities}
               onChange={ (e) =>  {
-                setEditEducation({...editEducation, activities: e.target.value})
+                setEditingEducation({...editingEducation, activities: e.target.value})
               }}
               placeholder="Ex: Alpha Phi Omega, Marching Band, Volleyball"
             />
@@ -398,9 +398,9 @@ function EditEducation({
           <Calendar
             id="education-start-date"
             className="p-inputtext-sm"
-            value={ editEducation.start_date}
+            value={ editingEducation.start_date}
             onChange={(e) => {
-              setEditEducation({...editEducation, start_date: e.value? e.value: editEducation.start_date })
+              setEditingEducation({...editingEducation, start_date: e.value? e.value: editingEducation.start_date })
             }}
             showIcon
             maxDate={new Date()}
@@ -418,9 +418,9 @@ function EditEducation({
           <Calendar
             id="education-end-date"
             className="p-inputtext-sm"
-            value={editEducation.end_date}
+            value={editingEducation.end_date}
             onChange={(e) => {
-              setEditEducation({...editEducation, end_date: e.value? e.value: editEducation.end_date })
+              setEditingEducation({...editingEducation, end_date: e.value? e.value: editingEducation.end_date })
             }}
             showIcon
             maxDate={new Date()}
@@ -439,9 +439,10 @@ function EditEducation({
             id="education-description"
             value={education.description}
             onTextChange={(e: EditorTextChangeEvent) =>
-              setEditEducation({...editEducation, description: e.htmlValue? e.htmlValue: editEducation.description})
+              setEditingEducation({...editingEducation, description: e.htmlValue? e.htmlValue: editingEducation.description})
             }
             required
+            style={{ height: '320px' }}
           />
         </div>
       </div>
@@ -450,7 +451,8 @@ function EditEducation({
 }
 
 const EducationList = () => {
-  const educations: EducationProps[] = []
+  const {draft, setEducationList} = useResumeEditorContext()
+  const educations = draft.educations
   // const educations = useSelector((state: RootState) => state.resume.resume?.educations)
   const [openAdd, setOpenAdd] = useState(false)
   if (educations === undefined || educations === null) {
@@ -472,25 +474,29 @@ const EducationList = () => {
       </div>
     );
   };
+  let educationListContent: ReactNode
+  if (Object.keys(educations).length > 0) {
+
+    educationListContent = Object.entries(educations).map((entry) => {
+          return (
+            <div className="education">
+              <Education education={entry[1]}/>
+            </div>
+          );
+        })
+  } else {
+    educationListContent = (<span className="c-empty">No any educations added yet.</span>)
+  }
 
   return (
     <Panel
       headerTemplate={headerTemplate}
       expandIcon={PrimeIcons.ANGLE_DOWN}
       collapseIcon={PrimeIcons.ANGLE_UP}
-      {...(educations.length > 0? {toggleable:true}:{} ) }
-      {...(educations.length > 0? {collapsed:true}:{} ) }
     >
       <div className="flex flex-column gap-5">
         <AddEducation  visible={openAdd} setVisible={setOpenAdd}/>
-        {educations.length > 0 ? educations.map((education, index) => {
-          return (
-            <div className="education">
-              <Education education={education} education_id={index}/>
-            </div>
-          );
-        }):(<span className="c-empty">No any education experiences added yet.</span>)
-      }
+        { educationListContent }
       </div>
     </Panel>
   );

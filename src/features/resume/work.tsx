@@ -8,6 +8,7 @@ import "primeicons/primeicons.css";
 import "primeflex/primeflex.css";
 import {
   Dispatch,
+  ReactNode,
   SetStateAction,
   useState,
 } from "react";
@@ -19,14 +20,14 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { EnumToObjects } from "../../utils/enum";
 import { createMarkup } from "../../utils/html";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
-import { addWork as addWorkAction, editWork as editWorkAction, delWork as delWorkAction } from "./resume-slice"
+import { v7 as uuidv7 } from "uuid"
+import { durationInMonths } from "../../utils/date";
+import { useResumeEditorContext } from "./context";
 
 
-const Work = ({ work, work_id}: { work: WorkProps, work_id: number }) => {
+const Work = ({ work}: { work: WorkProps }) => {
+  const { delWork } = useResumeEditorContext()
   const [openEdit, setOpenEdit] = useState(false);
-  const dispatch  = useDispatch<AppDispatch>()
 
   const title = () => {
     return (
@@ -42,7 +43,7 @@ const Work = ({ work, work_id}: { work: WorkProps, work_id: number }) => {
 
           <span
             className="pi pi-trash"
-            onClick={() => dispatch(delWorkAction(work_id)) }
+            onClick={() => delWork(work.id) }
           ></span>
         </div>
       </div>
@@ -60,11 +61,11 @@ const Work = ({ work, work_id}: { work: WorkProps, work_id: number }) => {
       // @ts-ignore
       dayOptions
     );
-
+    const last = durationInMonths(start_date, end_date)
     return (
       <div className="flex flex-column gap-2 text-sm">
         <span>{work.company + " . " + work.contract_kind}</span>
-        <span> {start_date + " - " + end_date + " . " + work.last} </span>
+        <span> {start_date + " - " + end_date + " , " + last} </span>
         <span> {work.location + " . " + work.type}</span>
       </div>
     );
@@ -76,7 +77,6 @@ const Work = ({ work, work_id}: { work: WorkProps, work_id: number }) => {
         visible={openEdit}
         setVisible={setOpenEdit}
         work={work}
-        work_id={work_id}
       />
       <Card title={title} subTitle={subtitle}>
         <p dangerouslySetInnerHTML={createMarkup(work.desp)}></p>
@@ -92,11 +92,11 @@ function AddWork({
   visible: boolean,
   setVisible: Dispatch<SetStateAction<boolean>>,
 }) {
-  const dispatch = useDispatch<AppDispatch>()
+  const {addWork} = useResumeEditorContext()
   const location_types = EnumToObjects(LocationKind).filter((item) => item.value !== LocationKind.NotSpecified);
   const employment_types = EnumToObjects(Contract).filter((item) => item.value !== Contract.NotSpecified);
 
-  const [editWork, setEditWork]:[WorkProps, Dispatch<SetStateAction<WorkProps>>] = useState({} as WorkProps);
+  const [editingWork, setEditingWork]:[WorkProps, Dispatch<SetStateAction<WorkProps>>] = useState({} as WorkProps);
 
   const footer = (
     <div className="c-actions">
@@ -104,7 +104,8 @@ function AddWork({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addWorkAction({...editWork}))
+          editingWork.id = uuidv7()
+          addWork(editingWork)
           setVisible(false);
         }}
       />
@@ -144,9 +145,9 @@ function AddWork({
             <InputText
               id="title"
               className="p-inputtext-sm"
-              value={editWork.role}
+              value={editingWork.role}
               onChange={ (e) =>  {
-                setEditWork({...editWork, role: e.target.value})
+                setEditingWork({...editingWork, role: e.target.value})
               }}
               placeholder="Ex: Backend Engineer"
             />
@@ -158,9 +159,9 @@ function AddWork({
             </label>
             <Dropdown
               id="employment-type"
-              value={editWork.contract_kind}
+              value={editingWork.contract_kind}
               onChange={(e) => { 
-                setEditWork({...editWork, contract_kind: e.value})
+                setEditingWork({...editingWork, contract_kind: e.value})
               }}
               options={employment_types}
               optionLabel="label"
@@ -176,9 +177,9 @@ function AddWork({
             <InputText
               id="company-name"
               className="p-inputtext-sm"
-              value={editWork.company}
+              value={editingWork.company}
               placeholder="Ex: Google"
-              onChange={ (e) => setEditWork({...editWork, company: e.target.value }) }
+              onChange={ (e) => setEditingWork({...editingWork, company: e.target.value }) }
             />
           </div>
 
@@ -190,8 +191,8 @@ function AddWork({
               id="location"
               className="p-inputtext-sm"
               placeholder="Ex: London, United Kingdom"
-              value={editWork.location}
-              onChange={ (e) => setEditWork({...editWork, location: e.target.value })}
+              value={editingWork.location}
+              onChange={ (e) => setEditingWork({...editingWork, location: e.target.value })}
             />
           </div>
 
@@ -201,9 +202,9 @@ function AddWork({
             </label>
             <Dropdown
               id="location-type"
-              value={ editWork.type }
+              value={ editingWork.type }
               onChange={(e) => {
-                setEditWork({...editWork, type: e.value})
+                setEditingWork({...editingWork, type: e.value})
               }}
               options={location_types}
               optionLabel="label"
@@ -219,9 +220,9 @@ function AddWork({
             <Calendar
               id="start-date"
               className="p-inputtext-sm"
-              value={ editWork.start_date }
+              value={ editingWork.start_date }
               onChange={(e) => {
-                setEditWork({...editWork, start_date: e.value?e.value: editWork.start_date})
+                setEditingWork({...editingWork, start_date: e.value?e.value: editingWork.start_date})
               }}
               showIcon
               maxDate={new Date()}
@@ -239,9 +240,9 @@ function AddWork({
             <Calendar
               id="end-date"
               className="p-inputtext-sm"
-              value={ editWork.end_date }
+              value={ editingWork.end_date }
               onChange={(e) => {
-                setEditWork({...editWork, end_date: e.value?e.value: editWork.end_date})
+                setEditingWork({...editingWork, end_date: e.value?e.value: editingWork.end_date})
               }}
               showIcon
               maxDate={new Date()}
@@ -258,10 +259,11 @@ function AddWork({
             </label>
             <Editor
               id="description"
-              value={editWork.desp?editWork.desp: ""}
+              value={editingWork.desp?editingWork.desp: ""}
               onTextChange={(e: EditorTextChangeEvent) =>
-                setEditWork({...editWork, desp: e.htmlValue ? e.htmlValue : ""})
+                setEditingWork({...editingWork, desp: e.htmlValue ? e.htmlValue : ""})
               }
+              style={{ height: '320px' }}
             />
           </div>
         </div>
@@ -271,18 +273,16 @@ function AddWork({
 }
 
 function EditWork({
-  work_id,
   work,
   visible,
   setVisible,
 }: {
-  work_id: number,
   work: WorkProps;
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
 }) {
-  const dispatch = useDispatch<AppDispatch>()
-  const [editWork, setEditWork]: [WorkProps, Dispatch<SetStateAction<WorkProps>>] = useState(work);
+  const { editWork } = useResumeEditorContext()
+  const [editingWork, setEditingWork]: [WorkProps, Dispatch<SetStateAction<WorkProps>>] = useState(work);
   const location_types = EnumToObjects(LocationKind).filter((item) => item.value !== LocationKind.NotSpecified);
   const employment_types = EnumToObjects(Contract).filter((item) => item.value !== Contract.NotSpecified);
 
@@ -292,7 +292,7 @@ function EditWork({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(editWorkAction([{...editWork}, work_id]))
+          editWork(work.id, editingWork)
           setVisible(false);
         }}
       />
@@ -331,9 +331,9 @@ function EditWork({
           <InputText
             id="title"
             className="p-inputtext-sm"
-            value={editWork.role}
+            value={editingWork.role}
             required
-            onChange={ (e) => setEditWork({...editWork,  role: e.target.value? e.target.value: editWork.role})}
+            onChange={ (e) => setEditingWork({...editingWork,  role: e.target.value? e.target.value: editingWork.role})}
           />
         </div>
 
@@ -343,10 +343,10 @@ function EditWork({
           </label>
           <Dropdown
             id="employment-type"
-            value={editWork.contract_kind}
+            value={editingWork.contract_kind}
             onChange={(e) => {
               // console.log(e.value)
-              setEditWork({...editWork, contract_kind: e.value})
+              setEditingWork({...editingWork, contract_kind: e.value})
             }}
             options={employment_types}
             optionLabel="label"
@@ -363,10 +363,10 @@ function EditWork({
           <InputText
             id="company-name"
             className="p-inputtext-sm"
-            value={editWork.company}
+            value={editingWork.company}
             required
             onChange={ (e) => {
-              setEditWork({...editWork, company: e.target.value? e.target.value: editWork.company})
+              setEditingWork({...editingWork, company: e.target.value? e.target.value: editingWork.company})
             }}
           />
         </div>
@@ -378,11 +378,11 @@ function EditWork({
           <InputText
             id="location"
             className="p-inputtext-sm"
-            value={editWork.location}
+            value={editingWork.location}
             required
             onChange={
               (e)  => {
-                setEditWork({...editWork, location: e.target.value? e.target.value: editWork.location })
+                setEditingWork({...editingWork, location: e.target.value? e.target.value: editingWork.location })
               }
             }
           />
@@ -394,9 +394,9 @@ function EditWork({
           </label>
           <Dropdown
             id="location-type"
-            value={ editWork.type }
+            value={ editingWork.type }
             onChange={(e) => {
-              setEditWork({...editWork, type: e.value})
+              setEditingWork({...editingWork, type: e.value})
             }}
             options={location_types}
             optionLabel="label"
@@ -413,9 +413,9 @@ function EditWork({
           <Calendar
             id="start-date"
             className="p-inputtext-sm"
-            value={ editWork.start_date }
+            value={ editingWork.start_date }
             onChange={(e) => {
-              setEditWork({...editWork, start_date: e.value? e.value: editWork.start_date })
+              setEditingWork({...editingWork, start_date: e.value? e.value: editingWork.start_date })
             }}
             showIcon
             maxDate={new Date()}
@@ -434,9 +434,9 @@ function EditWork({
           <Calendar
             id="end-date"
             className="p-inputtext-sm"
-            value={editWork.end_date}
+            value={editingWork.end_date}
             onChange={(e) => {
-              setEditWork({...editWork, end_date: e.value? e.value: editWork.end_date })
+              setEditingWork({...editingWork, end_date: e.value? e.value: editingWork.end_date })
             }}
             view="month"
             dateFormat="M yy"
@@ -455,9 +455,10 @@ function EditWork({
             id="description"
             value={work.desp}
             onTextChange={(e: EditorTextChangeEvent) =>
-              setEditWork({...editWork, desp: e.htmlValue? e.htmlValue: editWork.desp})
+              setEditingWork({...editingWork, desp: e.htmlValue? e.htmlValue: editingWork.desp})
             }
             required
+            style={{ height: '320px' }}
           />
         </div>
       </div>
@@ -466,11 +467,10 @@ function EditWork({
 }
 
 const WorkList = () => {
-  // const works =  useSelector((state: RootState) => state.resume.resume?.works )
-  let works = undefined
-
+  const {draft} = useResumeEditorContext()
   const [openAdd, setOpenAdd] = useState(false)
-  if (works === undefined || works == null) {
+  const works = draft.works
+  if (works === undefined || works === null) {
     return (<></>)
   }
 
@@ -490,23 +490,29 @@ const WorkList = () => {
     );
   };
 
+  let workListContent: ReactNode
+  if (Object.keys(works).length > 0) {
+
+    workListContent = Object.entries(works).map((entry) => {
+          return (
+            <div className="Work">
+              <Work work={entry[1]}/>
+            </div>
+          );
+        })
+  } else {
+    workListContent = (<span className="c-empty">No any works added yet.</span>)
+  }
+
   return (
     <Panel
       headerTemplate={headerTemplate}
-      {...(works.length > 0? {toggleable:true}:{} ) }
-      {...(works.length > 0? {collapsed:true}:{} ) }
       expandIcon={PrimeIcons.ANGLE_DOWN}
       collapseIcon={PrimeIcons.ANGLE_UP}
     >
       <div className="flex flex-column gap-5">
         <AddWork visible={openAdd} setVisible={setOpenAdd}/>
-        {works.length > 0 ? works.map((work, index) => {
-          return (
-            <div className="work">
-              <Work work={work} work_id={index}/>
-            </div>
-          );
-        }): (<span className="c-empty">No any work experiences added yet.</span>)}
+        {workListContent}
       </div>
     </Panel>
   );

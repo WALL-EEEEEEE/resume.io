@@ -3,26 +3,34 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
-import { Skill as SkillProps } from "../../types/resume";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Skill as SkillProps, Set } from "../../types/resume";
+import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 import { ProgressBar } from "primereact/progressbar";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
-import { delSkill as delSkillAction, addSkill as addSkillAction } from "./resume-slice"
+import { InputNumber, InputNumberValueChangeEvent } from "primereact/inputnumber";
+import { useResumeEditorContext } from "./context";
 
+const Skill = ({ skill }: { skill: SkillProps }) => {
+  const { delSkill } = useResumeEditorContext()
+  return (
+    <li className="flex flex-row justify-content-between">
+      <div className="inline-block flex flex-row w-9 justify-content-between">
+        <span> {skill.name} </span>
+        <ProgressBar className="w-8 min-w-min " value={skill.level * 10} showValue={false}></ProgressBar>
+      </div>
+      <span className="pi pi-trash" onClick={() => delSkill(skill.name)}> </span>
+    </li>
+  )
+}
 
 const SkillList = () => {
   const [openAdd, setOpenAdd] = useState(false)
-  // const skills = useSelector((state: RootState) => state.resume.resume?.skills)
-  const skills: SkillProps[] =  []
-  const dispatch = useDispatch<AppDispatch>()
+  const { draft } = useResumeEditorContext()
+  const skills: Set<SkillProps> | undefined = draft.skills
   if (skills == undefined || skills == null) {
     return (<></>)
   }
-
   const headerTemplate = (options: PanelHeaderTemplateOptions) => {
     const className = `${options.className} justify-content-space-between`;
-
     return (
       <div className={className}>
         <div className="flex align-items-center gap-2">
@@ -36,32 +44,29 @@ const SkillList = () => {
     );
   };
 
+  let skillListContent: ReactNode
+  if (Object.keys(skills).length > 0) {
+    skillListContent = Object.entries(skills).map((entry) => {
+      return (
+        <div className="c-skill-item">
+          <Skill skill={entry[1]} />
+        </div>
+      );
+    })
+  } else {
+    skillListContent = (<span className="c-empty">No any skills added yet.</span>)
+  }
+
   return (
     <Panel
       headerTemplate={headerTemplate}
-      {...(skills != undefined && skills != null && skills.length > 0 ? { toggleable: true } : {})}
-      {...(skills != undefined && skills != null && skills.length > 0 ? { collapsed: true } : {})}
       expandIcon={PrimeIcons.ANGLE_DOWN}
       collapseIcon={PrimeIcons.ANGLE_UP}
     >
       <AddSkill visible={openAdd} setVisible={setOpenAdd} />
-      {skills != undefined && skills != null && skills.length > 0 ? (
-        <ul className="list-none flex flex-column gap-3">
-          {skills.map((skill, index) => {
-            return (
-              <li className="flex flex-row justify-content-between">
-                <div className="inline-block flex flex-row w-9 justify-content-between">
-                  <span> {skill.name} </span>
-                  <ProgressBar className="w-8 min-w-min " value={Math.random() * 100} showValue={false}></ProgressBar>
-                </div>
-                <span className="pi pi-trash" onClick={() => dispatch(delSkillAction(index))}> </span>
-              </li>
-            )
-          })
-          }
-        </ul>) : (<span className="c-empty">No any skills added yet.</span>)
-
-      }
+      <div className="c-skills flex flex-column gap-3">
+        {skillListContent}
+      </div>
     </Panel>
   );
 };
@@ -73,8 +78,8 @@ function AddSkill({
   visible: boolean,
   setVisible: Dispatch<SetStateAction<boolean>>,
 }) {
-  const dispatch = useDispatch<AppDispatch>();
-  const [newSkill, setNewSkill]: [SkillProps, Dispatch<SetStateAction<SkillProps>>] = useState({} as SkillProps);
+  const { addSkill } = useResumeEditorContext()
+  const [editingSkill, setEditingSkill]: [SkillProps, Dispatch<SetStateAction<SkillProps>>] = useState({} as SkillProps);
 
   const footer = (
     <div className="c-actions">
@@ -82,7 +87,7 @@ function AddSkill({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addSkillAction({...newSkill}))
+          addSkill(editingSkill)
           setVisible(false);
         }}
       />
@@ -116,17 +121,28 @@ function AddSkill({
       <div className="add-container">
         <div className="c-add-skill flex flex-column gap-4">
           <div className="c-edit-skill-name flex flex-column gap-2">
-            <label className="text-sm" htmlFor="title">
+            <label className="text-sm" htmlFor="skill">
               Skill
             </label>
             <InputText
-              id="title"
+              id="skill"
               className="p-inputtext-sm"
-              value={newSkill.name}
+              value={editingSkill.name}
               onChange={(e) => {
-                setNewSkill({ ...newSkill, name: e.target.value })
+                setEditingSkill({ ...editingSkill, name: e.target.value })
               }}
               placeholder="Ex: Java"
+            />
+            <label className="text-sm" htmlFor="level">
+              Level
+            </label>
+            <InputNumber 
+                value={editingSkill.level} 
+                onValueChange={(e: InputNumberValueChangeEvent) => setEditingSkill({...editingSkill, level: e.target.value!})} 
+                mode="decimal" 
+                showButtons 
+                min={1}
+                max={10} 
             />
           </div>
         </div>

@@ -1,6 +1,7 @@
 export class CoverLetterMeta {
    id: string = ""
    name: string = ""
+   userId: string = ""
    category?: string = ""
    status?: string = ""
    createdTime?:Date

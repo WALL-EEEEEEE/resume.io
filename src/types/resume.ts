@@ -1,21 +1,24 @@
 export class ResumeMeta {
     id: string = ""
     name: string = ""
+    userId: string = ""
     category?: string[]
     status?:string
     createdTime?:Date
     updatedTime?:Date
 }
 
+export type Set<T> = {[id:string]: T}
+
 export class Resume  {
     meta: ResumeMeta = new ResumeMeta()
     profileImage?:string 
     about?: About
-    projects?: Project[]
-    works?: Work[]
-    skills?: Skill[]
-    educations?: Education[]
-    contacts?: Contact[]
+    projects?: Set<Project>
+    works?:  Set<Work>
+    skills?: Set<Skill>
+    educations?: Set<Education>
+    contacts?: Set<Contact>
 }
 
 export class About  {
@@ -23,6 +26,7 @@ export class About  {
 }
 
 export class Project  {
+    id: string = "";
     name: string = "";
     description: string = "";
     skills: string[] = []
@@ -43,6 +47,7 @@ export enum Degree {
 }
 
 export class Education {
+    id: string = "";
     school: string = "";
     degree: Degree = Degree.NotSpeficifed;
     field:  string = "";
@@ -92,6 +97,7 @@ export class Email implements Contact {
 
 
 export class Work {
+    id: string = "";
     role: string = "";
     company: string = "";
     contract_kind:  Contract = Contract.NotSpecified;
@@ -105,5 +111,6 @@ export class Work {
 
 export class Skill {
     name: string = "";
+    level: number = 0;
 }
 

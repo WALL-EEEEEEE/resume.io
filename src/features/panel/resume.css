@@ -8,3 +8,7 @@
     visibility: visible;
     opacity: 1;
 }
+.c-resume-panel-paginator,.p-paginator-bottom {
+    height: 10%;
+    border: none;
+}

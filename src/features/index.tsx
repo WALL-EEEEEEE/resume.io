@@ -6,7 +6,7 @@ import "primereact/resources/primereact.min.css";                  //core css
 import "primeicons/primeicons.css";                                //icons
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store";
-import { addUser as createUserAction } from "./user/user-list-slice";
+import { userAdded } from "./user/user-list-slice";
 import { authLogin as authLoginAction } from "./user/auth-slice";
 import { User as UserProps }  from "../types/user";
 
@@ -22,7 +22,7 @@ const Index = () => {
   //fake auth
   const user = createFakeUser()
   const dispatch = useDispatch<AppDispatch>()
-  dispatch(createUserAction(user))
+  dispatch(userAdded(user))
   dispatch(authLoginAction(user.id)) 
 
   const navigate = useNavigate()
@@ -35,8 +35,8 @@ const Index = () => {
     } },
   ]
   return (
-    <div className="c-app flex flex-column align-items-center">
-      <div className="c-header w-full h-3rem flex flex-row justify-content-between align-items-center">
+    <div className="c-app flex flex-column align-items-center justify-items-stretch h-full min-h-full max-h-full">
+      <div className="c-header w-full flex flex-row justify-content-between align-items-center" style={{ height: "10%", maxHeight: "3rem"}}>
         <div className="">
           <div className="c-logo ml-5 text-3xl font-semibold">
             <span>Resume</span>
@@ -73,11 +73,12 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="c-main w-9 mt-5">
+      <div className="c-main w-9 mt-5" style={{ height: "90%"} }>
+        <div id="c-image-uploader" className="c-image-uploader" style={{ zIndex: 9999, position: "absolute" }}></div>
         <Outlet />
       </div>
 
-      <div className="c-footer w-full h-3rem flex flex-row align-items-center border-top-1 surface-border mt-4 pl-3 gap-1" style={{color: "rgb(76 83 90)", fontSize: "12px"}}>
+      <div className="c-footer w-full flex flex-row align-items-center border-top-1 surface-border mt-4 pl-4 gap-1" style={{color: "rgb(76 83 90)", fontSize: "12px", height: "10%", maxHeight: "3rem"}}>
         <span className="flex flex-row gap-1 align-items-center">
           <a href="https://github.com/WALL-EEEEEEE/resume.io" className="flex flex-row align-items-center" style={{textDecoration: "none", color: "#06b6d4", fontSize:"14px"}}>resume.io</a>
           <span> 0.01 </span>

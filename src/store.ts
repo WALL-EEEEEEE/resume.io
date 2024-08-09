@@ -1,10 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import resumeListReducer from "./features/panel/resume-list-slice"
+import draftResumeListReducer from "./features/resume/draft-resume-list-slice"
+import draftCoverLetterListReducer from "./features/cover-letter/cover-letter-slice"
 import userListReducer from "./features/user/user-list-slice";
 import coverLetterListReducer from "./features/panel/cover-letter-list-slice";
 import authReducer from "./features/user/auth-slice";
 import createIdbStorage from '@piotr-cz/redux-persist-idb-storage'
-import { persistStore, persistReducer} from "redux-persist";
+import { persistStore, persistReducer  } from "redux-persist";
+import localStorage from 'redux-persist/lib/storage'
 
 const storage = createIdbStorage({
     name: "resume.io",
@@ -36,11 +39,16 @@ const authPersistConfig = {
     serialize: false,
     deserialize: false
 }
+const draftResumeListPersistConfig = {
+    key: "draft-resumes",
+    storage: localStorage,
+}
 
 const authPersistedReducer = persistReducer(authPersistConfig, authReducer)
 const userListPersistedReducer = persistReducer(userListPersistConfig, userListReducer)
 const resumeListPersistedReducer = persistReducer(resumeListPersistConfig, resumeListReducer)
 const coverLetterListPersistReducer = persistReducer(coverLetterListPersistConfig, coverLetterListReducer)
+const draftResumeListPersistReducer = persistReducer(draftResumeListPersistConfig, draftResumeListReducer)
 
 //configure the store
 export const store = configureStore({
@@ -49,6 +57,8 @@ export const store = configureStore({
         "resume-list": resumeListPersistedReducer,
         "cover-letter-list": coverLetterListPersistReducer,
         "auth": authPersistedReducer,
+        "draft-resume-list": draftResumeListPersistReducer,
+        "draft-coverLetter-list": draftCoverLetterListReducer,
     }
 });
 export const persistor = persistStore(store)

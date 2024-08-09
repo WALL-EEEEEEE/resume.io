@@ -1,27 +1,60 @@
 import { PrimeIcons } from "primereact/api";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
-import { ContactKind, Contact as ContactProps, Phone } from "../../types/resume";
-import { Dispatch, MutableRefObject, SetStateAction, useRef, useState } from "react";
+import { ContactKind, Contact as ContactProps } from "../../types/resume";
+import { Dispatch, MutableRefObject, ReactNode, SetStateAction, useRef, useState } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { TieredMenu } from "primereact/tieredmenu";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
-import { delContact as delContactAction, addContact as addContactAction, editContact as editContactAction } from "./resume-slice"
+import { useResumeEditorContext } from "./context";
 
+
+function Contact({ contact }: { contact: ContactProps }) {
+  const { delContact } = useResumeEditorContext()
+
+  switch (contact.kind) {
+    case ContactKind.Email:
+      return (
+        <li className="c-contact-item flex flex-row justify-content-between">
+          <div className="flex flex-row gap-2 align-items-center">
+            {/* {contact.kind === ContactKind.Phone && (
+                    <span className="pi pi-mobile"></span>
+                  )} */}
+            <span className="pi pi-envelope"></span>
+            <span>{contact.value}</span>
+          </div>
+          <span className="pi pi-trash" onClick={(e) => delContact(contact.kind)}></span>
+        </li>
+      )
+    case ContactKind.Phone:
+      return (
+        <li className="c-contact-item flex flex-row justify-content-between">
+          <div className="flex flex-row gap-2 align-items-center">
+            {contact.kind === ContactKind.Phone && (
+              <span className="pi pi-mobile"></span>
+            )}
+            <span>{contact.value} </span>
+          </div>
+          <span className="pi pi-trash" onClick={(e) => delContact(contact.kind)}></span>
+        </li>
+      )
+    default:
+      return (<></>)
+  }
+
+}
 
 function AddContact({
-  contactKind,
+  kind,
   visible,
   setVisible,
 }: {
-  contactKind: ContactKind
+  kind: ContactKind
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
 }) {
-  const dispatch = useDispatch<AppDispatch>()
-  const [newContact, setNewContact]: [
+  const { addContact } = useResumeEditorContext()
+  const [editingContact, setEditingContact]: [
     ContactProps,
     Dispatch<SetStateAction<ContactProps>>
   ] = useState({} as ContactProps);
@@ -32,7 +65,7 @@ function AddContact({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addContactAction({...newContact}))
+          addContact(editingContact)
           setVisible(false);
         }}
       />
@@ -48,10 +81,44 @@ function AddContact({
       />
     </div>
   );
+  let contactInput: ReactNode
+  switch (kind) {
+    case ContactKind.Email:
+      contactInput = (
+        <div className={`c-edit-contact-email flex flex-column gap-2`}>
+          <label className="text-sm" htmlFor="contact-email">
+            Email
+          </label>
+          <InputText id="contact-email" className="p-inputtext-sm" placeholder="xxxxxx@xxxx"
+            keyfilter="email"
+            value={editingContact.value === "" ? null : editingContact.value}
+            onChange={(e) => {
+              setEditingContact({ ...editingContact, value: e.target.value, kind: kind });
+            }}
+          ></InputText>
+        </div>
+      )
+      break
+    case ContactKind.Phone:
+      contactInput = (
+        <div className="c-edit-contact-phone flex flex-column gap-2" >
+          <label className="text-sm" htmlFor="contact-phone">
+            Phone
+          </label>
+          <InputText id="contact-phone" className="p-inputtext-sm"  placeholder="xxxx-xxxxxxxxx"
+            value={editingContact.value === "" ? null : editingContact.value}
+            onChange={(e) => {
+              setEditingContact({ ...editingContact, value: e.target.value, kind: kind });
+            }}
+          ></InputText>
+        </div>
+      )
+      break
+  }
 
   return (
     <Dialog
-      header={`Add ${contactKind}`}
+      header={`Add ${kind}`}
       visible={visible}
       draggable={false}
       resizable={false}
@@ -65,20 +132,7 @@ function AddContact({
     >
       <div className="add-container">
         <div className="c-add-contact flex flex-column gap-4">
-          <div className={`c-edit-contact-${contactKind} flex flex-column gap-2`}>
-            <label className="text-sm" htmlFor={`contact-${contactKind}`}>
-              {contactKind}
-            </label>
-            <InputText
-              id={`contact-${contactKind}`}
-              className="p-inputtext-sm"
-              value={newContact.value === "" ? null : newContact.value}
-              onChange={(e) => {
-                setNewContact({ ...newContact, value: e.target.value, kind: contactKind });
-              }}
-              placeholder={contactKind === ContactKind.Phone ? "Ex: xxxx-xxx-xxx" : contactKind === ContactKind.Email ? "Ex: example@gmail.com" : ""}
-            />
-          </div>
+          {contactInput}
         </div>
       </div>
     </Dialog>
@@ -87,16 +141,15 @@ function AddContact({
 
 function EditContact({
   contact,
-  setContact,
   visible,
   setVisible,
 }: {
   contact: ContactProps;
-  setContact: Dispatch<SetStateAction<ContactProps>>;
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
 }) {
-  const [newContact, setNewContact]: [
+  const { editContact } = useResumeEditorContext()
+  const [editingContact, setEditingContact]: [
     ContactProps,
     Dispatch<SetStateAction<ContactProps>>
   ] = useState(contact);
@@ -107,7 +160,7 @@ function EditContact({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          setContact(newContact);
+          editContact(editingContact.kind, editingContact);
           setVisible(false);
         }}
       />
@@ -123,6 +176,42 @@ function EditContact({
       />
     </>
   );
+  let contactInput: ReactNode
+  switch (contact.kind) {
+    case ContactKind.Email:
+      contactInput = (
+        <div className={`c-edit-contact-email flex flex-column gap-2`}>
+          <label className="text-sm" htmlFor="contact-email">
+            Email
+          </label>
+          <InputText id="contact-email" className="p-inputtext-sm" placeholder="xxxxxx@xxxx"
+            keyfilter="email"
+            value={editingContact.value === "" ? null : editingContact.value}
+            onChange={(e) => {
+              setEditingContact({ ...editingContact, value: e.target.value, kind: contact.kind});
+            }}
+          ></InputText>
+        </div>
+      )
+      break
+    case ContactKind.Phone:
+      contactInput = (
+        <div className={`c-edit-contact-phone flex flex-column gap-2`}>
+          <label className="text-sm" htmlFor="contact-phone">
+            Phone
+          </label>
+          <InputText id="contact-phone" className="p-inputtext-sm"  placeholder="xxxx-xxxxxxxxx"
+            value={editingContact.value === "" ? null : editingContact.value}
+            onChange={(e) => {
+              setEditingContact({ ...editingContact, value: e.target.value, kind: contact.kind });
+            }}
+          ></InputText>
+        </div>
+      )
+      break
+  }
+
+
 
   return (
     <Dialog
@@ -139,33 +228,15 @@ function EditContact({
       footer={footer}
     >
       <div className="c-edit-contact flex flex-column gap-4">
-        <div className={`c-edit-contact-${contact.kind} flex flex-column gap-2`}>
-          <label className="text-sm" htmlFor={`contact-${contact.kind}`}>
-            {contact.kind}
-          </label>
-          <InputText
-            id={`contact-${contact.kind}`}
-            className="p-inputtext-sm"
-            value={newContact.value}
-            required
-            onChange={(e) =>
-              setNewContact({
-                ...newContact,
-                value: e.target.value ? e.target.value : newContact.value,
-              })
-            }
-          />
-        </div>
-
+        {contactInput}
       </div>
     </Dialog>
   );
 }
 
 const ContactList = () => {
-  const contacts :ContactProps[] = []
-  // const contacts = useSelector((state: RootState) => state.resume.resume?.contacts)
-  const dispatch = useDispatch<AppDispatch>()
+  const { draft } = useResumeEditorContext()
+  const contacts = draft.contacts
   const [addContactKind, setAddContactKind] = useState(ContactKind.NotSpecified)
   const [openAdd, setOpenAdd] = useState(false);
   const menu: MutableRefObject<TieredMenu | null> = useRef(null);
@@ -215,40 +286,33 @@ const ContactList = () => {
     );
   };
 
+  let contactListContent: ReactNode
+  if (Object.keys(contacts).length > 0) {
+    contactListContent = Object.entries(contacts).map((entry) => {
+      return (
+        <div className="c-contact-item">
+          <Contact contact={entry[1]} />
+        </div>
+      );
+    })
+  } else {
+    contactListContent = (<span className="c-empty">No any contacts added yet.</span>)
+  }
+
   return (
     <Panel
       headerTemplate={headerTemplate}
-      {...(contacts.length > 0 ? { toggleable: true } : {})}
-      {...(contacts.length > 0 ? { collapsed: true } : {})}
       expandIcon={PrimeIcons.ANGLE_DOWN}
       collapseIcon={PrimeIcons.ANGLE_UP}
     >
       <AddContact
-        contactKind={addContactKind}
+        kind={addContactKind}
         visible={openAdd}
         setVisible={setOpenAdd}
       />
-
-      {contacts.length > 0 ? (
-        <ul className="flex flex-column gap-5">
-          {contacts.map((contact, index) => {
-            return (
-              <li className="c-contact-item flex flex-row justify-content-between">
-                <div className="flex flex-row gap-2 align-items-center">
-                  {contact.kind === ContactKind.Phone && (
-                    <span className="pi pi-mobile"></span>
-                  )}
-                  {contact.kind === ContactKind.Email && (
-                    <span className="pi pi-envelope"></span>
-                  )}
-                  <span>{contact.value} </span>
-                </div>
-                <span className="pi pi-trash" onClick={(e) => dispatch(delContactAction(index))}></span>
-              </li>
-            );
-          })}
-        </ul>) : (<span className="c-empty">No any contacts added yet.</span>)
-      }
+      <div className="c-contacts flex flex-column gap-3">
+          {contactListContent}
+      </div>
     </Panel>
   );
 };

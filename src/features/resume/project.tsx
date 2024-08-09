@@ -8,6 +8,7 @@ import "primeicons/primeicons.css";
 import "primeflex/primeflex.css";
 import {
   Dispatch,
+  ReactNode,
   SetStateAction,
   useState,
 } from "react";
@@ -19,13 +20,12 @@ import { Calendar } from "primereact/calendar";
 //@ts-ignore
 import  Microlink from '@microlink/react'
 import { createMarkup } from "../../utils/html";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
-import { delProject as delProjectAction, addProject as addProjectAction, editProject as editProjectAction } from "./resume-slice";
+import { durationInMonths } from "../../utils/date";
+import { useResumeEditorContext } from "./context";
 
 
-const Project = ({ project, project_id}: { project: ProjectProps, project_id: number }) => {
-  const dispatch = useDispatch<AppDispatch>()
+const Project = ({ project, project_id}: { project: ProjectProps, project_id: string }) => {
+  const { delProject } = useResumeEditorContext()
   const [openEdit, setOpenEdit] = useState(false);
 
   const title = () => {
@@ -42,7 +42,7 @@ const Project = ({ project, project_id}: { project: ProjectProps, project_id: nu
 
           <span
             className="pi pi-trash"
-            onClick={() => dispatch(delProjectAction(project_id)) }
+            onClick={() => delProject(project_id) }
           ></span>
         </div>
       </div>
@@ -60,10 +60,10 @@ const Project = ({ project, project_id}: { project: ProjectProps, project_id: nu
       // @ts-ignore
       dayOptions
     );
-
+    const last = durationInMonths(start_date, end_date)
     return (
       <div className="flex flex-column gap-2 text-sm">
-        <span> {start_date + " - " + end_date } </span>
+        <span> {start_date + " - " + end_date + " , " + last } </span>
       </div>
     );
   };
@@ -93,9 +93,9 @@ function AddProject({
   visible: boolean,
   setVisible: Dispatch<SetStateAction<boolean>>,
 }) {
-  const dispatch =  useDispatch<AppDispatch>()
+  const {addProject} = useResumeEditorContext()
 
-  const [newProject, setNewProject]:[ProjectProps, Dispatch<SetStateAction<ProjectProps>>] = useState({} as ProjectProps);
+  const [project, setProject] = useState({} as ProjectProps);
 
   const footer = (
     <div className="c-actions">
@@ -103,7 +103,7 @@ function AddProject({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(addProjectAction({...newProject}))
+          addProject(project)
           setVisible(false);
         }}
       />
@@ -143,9 +143,9 @@ function AddProject({
             <InputText
               id="project-name"
               className="p-inputtext-sm"
-              value={newProject.name}
+              value={ project.name === ""?null: project.name }
               onChange={ (e) =>  {
-                setNewProject({...newProject, name: e.target.value})
+                setProject({...project, name: e.target.value})
               }}
               placeholder="Ex: Kubernetes"
             />
@@ -158,9 +158,9 @@ function AddProject({
             <InputText
               id="project-url"
               className="p-inputtext-sm"
-              value={newProject.url === "" ? null: newProject.url}
+              value={ project.url === "" ? null: project.url }
               placeholder="Ex: https://www.github.com/kubernetes"
-              onChange={ (e) => setNewProject({...newProject, url: e.target.value }) }
+              onChange={ (e) => setProject({...project, url: e.target.value}) }
             />
           </div>
 
@@ -172,9 +172,9 @@ function AddProject({
             <Calendar
               id="project-start-date"
               className="p-inputtext-sm"
-              value={ newProject.start_date == new Date(0) ? null: newProject.start_date }
+              value={ project.start_date == new Date(0) ? null: project.start_date }
               onChange={(e) => {
-                setNewProject({...newProject, start_date: e.value?e.value: newProject.start_date})
+                setProject({...project, start_date: e.value??project.start_date})
               }}
               showIcon
               maxDate={new Date()}
@@ -192,9 +192,9 @@ function AddProject({
             <Calendar
               id="end-date"
               className="p-inputtext-sm"
-              value={ newProject.end_date === new Date(0) ? null : newProject.end_date}
+              value={ project.end_date === new Date(0) ? null : project.end_date}
               onChange={(e) => {
-                setNewProject({...newProject, end_date: e.value?e.value: newProject.end_date})
+                setProject({...project, end_date: e.value??project.end_date})
               }}
               showIcon
               maxDate={new Date()}
@@ -211,10 +211,11 @@ function AddProject({
             </label>
             <Editor
               id="description"
-              value={newProject.description}
+              value={project.description}
               onTextChange={(e: EditorTextChangeEvent) =>
-                setNewProject({...newProject, description: e.htmlValue ? e.htmlValue : ""})
+                setProject({...project, description: e.htmlValue??""})
               }
+              style={{ height: '320px' }}
             />
           </div>
         </div>
@@ -230,12 +231,12 @@ function EditProject({
   setVisible,
 }: {
   project: ProjectProps;
-  project_id: number,
+  project_id: string,
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
 }) {
-  const dispatch = useDispatch<AppDispatch>()
-  const [editProject, setEditProject]: [ProjectProps, Dispatch<SetStateAction<ProjectProps>>] = useState(project);
+  const {editProject}  = useResumeEditorContext()
+  const [editingProject, setEditingProject]: [ProjectProps, Dispatch<SetStateAction<ProjectProps>>] = useState(project);
 
   const footer = (
     <>
@@ -243,7 +244,7 @@ function EditProject({
         label="Save"
         icon="pi pi-check-circle"
         onClick={() => {
-          dispatch(editProjectAction([{...editProject}, project_id]))
+          editProject(project_id, editingProject)
           setVisible(false);
         }}
       />
@@ -282,9 +283,9 @@ function EditProject({
             <InputText
               id="project-name"
               className="p-inputtext-sm"
-              value={editProject.name}
+              value={editingProject.name}
               onChange={ (e) =>  {
-                setEditProject({...editProject, name: e.target.value})
+                setEditingProject({...editingProject, name: e.target.value})
               }}
               placeholder="Ex: Kubernetes"
             />
@@ -297,9 +298,9 @@ function EditProject({
             <InputText
               id="project-url"
               className="p-inputtext-sm"
-              value={editProject.url === "" ? null: editProject.url}
+              value={editingProject.url === "" ? null: editingProject.url}
               placeholder="Ex: https://www.github.com/kubernetes"
-              onChange={ (e) => setEditProject({...editProject, url: e.target.value }) }
+              onChange={ (e) => setEditingProject({...editingProject, url: e.target.value }) }
             />
           </div>
 
@@ -311,9 +312,9 @@ function EditProject({
             <Calendar
               id="project-start-date"
               className="p-inputtext-sm"
-              value={ editProject.start_date == new Date(0) ? null: editProject.start_date }
+              value={ editingProject.start_date == new Date(0) ? null: editingProject.start_date }
               onChange={(e) => {
-                setEditProject({...editProject, start_date: e.value?e.value: editProject.start_date})
+                setEditingProject({...editingProject, start_date: e.value?e.value: editingProject.start_date})
               }}
               showIcon
               maxDate={new Date()}
@@ -331,9 +332,9 @@ function EditProject({
             <Calendar
               id="end-date"
               className="p-inputtext-sm"
-              value={ editProject.end_date === new Date(0) ? null : editProject.end_date}
+              value={ editingProject.end_date === new Date(0) ? null : editingProject.end_date}
               onChange={(e) => {
-                setEditProject({...editProject, end_date: e.value?e.value: editProject.end_date})
+                setEditingProject({...editingProject, end_date: e.value?e.value: editingProject.end_date})
               }}
               showIcon
               maxDate={new Date()}
@@ -350,10 +351,12 @@ function EditProject({
             </label>
             <Editor
               id="description"
-              value={editProject.description}
+              value={editingProject.description}
               onTextChange={(e: EditorTextChangeEvent) =>
-                setEditProject({...editProject, description: e.htmlValue ? e.htmlValue : ""})
+                setEditingProject({...editingProject, description: e.htmlValue ? e.htmlValue : ""})
               }
+
+              style={{ height: '320px' }}
             />
           </div>
       </div>
@@ -362,8 +365,8 @@ function EditProject({
 }
 
 const ProjectList = () => {
-  // const projects = useSelector((state: RootState) => state.resume.resume?.projects)
-  const projects: ProjectProps[] = []
+  const { draft } = useResumeEditorContext()
+  const projects = draft.projects
   const [openAdd, setOpenAdd] = useState(false)
   if (projects === undefined || projects === null) {
     return (<></>)
@@ -384,24 +387,28 @@ const ProjectList = () => {
       </div>
     );
   };
+  let projectListContent: ReactNode
+  if (Object.keys(projects).length > 0) {
 
+    projectListContent = Object.entries(projects).map((entry) => {
+          return (
+            <div className="project">
+              <Project project={entry[1]} project_id={entry[0]}/>
+            </div>
+          );
+        })
+  } else {
+    projectListContent = (<span className="c-empty">No any projects added yet.</span>)
+  }
   return (
     <Panel
       headerTemplate={headerTemplate}
-      {...(projects.length > 0? {toggleable:true}:{} ) }
-      {...(projects.length > 0? {collapsed:true}:{} ) }
       expandIcon={PrimeIcons.ANGLE_DOWN}
       collapseIcon={PrimeIcons.ANGLE_UP}
     >
       <div className="flex flex-column gap-5">
         <AddProject visible={openAdd} setVisible={setOpenAdd}/>
-        {projects.length > 0 ? projects.map((project, index) => {
-          return (
-            <div className="project">
-              <Project project={project} project_id={index}/>
-            </div>
-          );
-        }): (<span className="c-empty">No any projects added yet.</span>)}
+        {projectListContent}
       </div>
     </Panel>
   );

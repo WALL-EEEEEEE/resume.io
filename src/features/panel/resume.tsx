@@ -1,29 +1,23 @@
-import Resume from "../resume/resume"
-import CoverLetter from "../cover-letter/cover-letter"
+import { Resume, AddResume } from "../resume/resume"
 import { Resume as ResumeProps } from "../../types/resume"
-import { User as UserProps } from "../../types/user"
 import { Panel, PanelPassThroughOptions } from "primereact/panel"
 import { Fieldset } from "primereact/fieldset"
 import { Toolbar, ToolbarPassThroughOptions } from "primereact/toolbar"
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Button } from "primereact/button"
-import { Rating } from "primereact/rating"
-import { Tag } from "primereact/tag"
-import { classNames } from "primereact/utils"
-import { Dispatch, SetStateAction, Suspense, useEffect, useState } from "react"
-import dataset from "../../data/resume.io_exported_data.json"
+import { useEffect, useState } from "react"
 import { getFile } from "../../utils/opfs"
-import "./resume.css"
-import { ProgressSpinner } from "primereact/progressspinner"
-import { OverlayPanel } from "primereact/overlaypanel"
 import { Dialog } from "primereact/dialog"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "../../store"
-import { addUser as createUserAction } from "../user/user-list-slice"
 import { v7 as uuidv7 } from "uuid"
-import { LoaderFunctionArgs, redirect, useLoaderData, useNavigate } from "react-router-dom"
+import { LoaderFunctionArgs, redirect, useLoaderData } from "react-router-dom"
 import { Auth } from "../../types/auth"
-
+import { resumeAdded } from "./resume-list-slice"
+import "./resume.css"
+import { useAppDispatch, useAppSelector } from "../../hooks"
+import { selectCurrentUser } from "../user/auth-slice"
+import { newResumeEditor } from "../resume/context"
 
 
 export async function loader(args: LoaderFunctionArgs<Auth>) {
@@ -32,9 +26,6 @@ export async function loader(args: LoaderFunctionArgs<Auth>) {
         return redirect("/login")
     }
     return auth.user
-    /*
-
-    */
 }
 
 
@@ -43,6 +34,7 @@ export function ResumePanel() {
     const dispatch = useDispatch()
 
     const resumeList = useSelector((state: RootState) => {
+        console.log(user_id)
         const userInfo = state["user-list"][user_id]
         const resumes = state["resume-list"]
         const resumeIdList = userInfo.resumes
@@ -69,10 +61,10 @@ export function ResumePanel() {
     );
     const panelPt: PanelPassThroughOptions = {
         content: {
-            className: "min-h-screen",
+            className: "h-full",
         },
         toggleableContent: {
-            className: "min-h-screen",
+            className: "h-full",
         }
 
     }
@@ -94,7 +86,7 @@ export function ResumePanel() {
 
         return (
             <div className="flex flex-row align-items-center h-full w-full justify-content-center" style={{ backgroundImage: `url("${pendingimage}")`, backgroundPosition: "center", backgroundSize: "contain", backgroundRepeat: "no-repeat" }}>
-                <Button icon="pi pi-eye" className="c-resume-edit-icon w-3rem h-3rem border-circle border-none "></Button>
+                <Button icon="pi pi-eye" className="c-resume-edit-icon w-2rem h-2rem border-circle border-none "></Button>
             </div>
         )
     }
@@ -109,19 +101,18 @@ export function ResumePanel() {
                 return ""
             }
             const blob = URL.createObjectURL(await imageFile.getFile())
-            console.log(blob)
             return blob
         }
         const image = resume.profileImage == undefined || resume.profileImage == null ? "" : resume.profileImage
 
         return (
-            <div className="c-panel-item flex flex-row align-items-center justify-content-center col-4 border-primary border-1 max-w-12rem border-round-md" style={{ aspectRatio: "1/1" }}>
+            <div className="c-panel-item flex flex-row align-items-center justify-content-center col-4 border-primary border-1 max-w-8rem border-round-md " style={{ aspectRatio: "1/1" }}>
                 <div className="c-resume-item flex flex-column w-full h-full align-items-center justify-content-between">
                     <AsyncImage image={image} loader={imageLoader}></AsyncImage>
                     <div className="flex flex-column gap-2 align-items-center w-full">
                         <div className="flex flex-row justify-content-center gap-2 align-items-center">
                             <span className="c-resume-info-name"> {resume.meta.name} </span>
-                            <span className="c-resume-info-status pi pi-verified "></span>
+                            <span className="c-resume-info-status pi pi-verified"></span>
                         </div>
                         <span className="c-resume-info-time flex flex-row justify-content-end block w-full">
                             <span className="c-resume-info-uploaded-time text-xs pr-3 pb-2">{resume.meta.updatedTime}</span>
@@ -137,18 +128,16 @@ export function ResumePanel() {
             return ItemTemplate(resume, index);
         });
         return (
-            <div className="grid grid-nogutter gap-4 justify-content-start" style={{ margin: "0 auto", overflow: "scroll" }}>
+            <div className="grid grid-nogutter gap-4 justify-content-start">
                 {list}
-                <div className="c-panel-item flex flex-row align-items-center justify-content-center col-4 border-primary border-1 border-round-md max-w-12rem" style={{ aspectRatio: "1/1" }}>
+                <div className="c-panel-item flex flex-row align-items-center justify-content-center col-4 border-primary border-1 border-round-md max-w-8rem" style={{ aspectRatio: "1/1" }}>
                     <div className="c-add-resume">
-                        <Button icon="pi pi-plus-circle" className="w-3rem h-3rem border-circle border-none " onClick={() => {
-                            console.log("try to add resume")
+                        <Button icon="pi pi-plus-circle" className="w-2rem h-2rem border-circle border-none " onClick={() => {
                             setToggle(true)
-                            console.log("try to add resume", toggle)
                         }
                         } />
                     </div>
-                    <AddResume toggle={toggle} onClose={ () => { setToggle(false) }}/>
+                    <AddResumeModal toggle={toggle} onClose={() => { setToggle(false) }} />
                 </div>
             </div>
 
@@ -164,22 +153,33 @@ export function ResumePanel() {
 
     return (
         <>
-            <Panel className="min-h-screen" pt={panelPt}>
-                <div className="flex flex-row gap-2 h-screen">
-                    <div className="card h-screen">
+            <Panel className="c-resume-panel h-full" pt={panelPt}>
+                <div className="flex flex-row gap-2 h-full">
+                    <div className="card">
                         <Toolbar center={centerContent} className="h-full" pt={toolBarPt} />
                     </div>
-                    <Fieldset legend="Resume" className="min-h-full min-w-full">
-                        <DataView value={resumeList} listTemplate={ListTemplate} className="min-h-screen" style={{ overflow: "scroll" }} rows={11} paginator>
+                    <Fieldset legend="Resume" className="h-full w-full" pt={{
+                        toggleableContent: {
+                            className: "h-full mt-3",
+                        },
+                        content: {
+                            className: "h-full",
+                        },
+                    }}>
+                        <DataView value={resumeList} listTemplate={ListTemplate} className="h-full" pt={{
+                            content: {
+                                style: { height: "88%" }
+                            },
+                        }} rows={11} paginatorClassName="c-resume-panel-paginator" paginator>
                         </DataView>
                     </Fieldset>
                 </div>
 
-            </Panel>
+            </Panel >
         </>)
 }
 
-export function ViewResume({ resume, toggle }: { resume: ResumeProps, toggle: boolean }) {
+export function ViewResumeModal({ resume, toggle }: { resume: ResumeProps, toggle: boolean }) {
     const dispatch = useDispatch<AppDispatch>()
     let setToggle
     [toggle, setToggle] = useState(toggle)
@@ -206,26 +206,37 @@ export function ViewResume({ resume, toggle }: { resume: ResumeProps, toggle: bo
     )
 }
 
-export function AddResume({ toggle, onClose }: { toggle: boolean, onClose: ()=>void }) {
-    console.log("inside AddResume 1", toggle);
-    const dispatch = useDispatch<AppDispatch>();
+export function AddResumeModal({ toggle, onClose }: { toggle: boolean, onClose: () => void }) {
+    const current_user = useAppSelector(selectCurrentUser)
+    const dispatch = useAppDispatch();
+    const [draft, setDraft] = useState({
+        meta: {
+            id: "draft",
+            name: "New Resume"
+        }
+    } as ResumeProps)
+    const {context, editor} = newResumeEditor(draft, setDraft)
+    console.log("Add Resume Modal", draft.meta.id)
 
     const footer = (
         <div className="actions">
             <Button label="Save" icon="pi pi-check-circle" onClick={() => {
+                console.log(current_user, draft)
+                dispatch(resumeAdded({...draft, meta: {...draft.meta, id: uuidv7()}}, current_user!.id))
                 onClose()
             }} />
             <Button label="Cancel" icon="pi pi-times-circle" onClick={() => {
-                console.log("cancel")
                 onClose()
             }} autoFocus className="p-button-text" />
         </div>
     );
     return (
-        <Dialog header="Add Resume" visible={toggle} draggable={false} resizable={false} maximizable={true} style={{ width: '50vw' }} onHide={() => { 
-              onClose()
-            }} footer={footer}>
-            <Resume />
+        <Dialog header="Add Resume" visible={toggle} draggable={false} resizable={false} maximizable={true} style={{ width: '50vw' }} onHide={() => {
+            onClose()
+        }} footer={footer}>
+            <context.Provider value={editor}>
+                <AddResume/>
+            </context.Provider>
         </Dialog>
     )
 }
